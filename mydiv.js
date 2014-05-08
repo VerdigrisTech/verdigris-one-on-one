@@ -129,21 +129,23 @@ function major (graph) {
         console.log('--------------------'+i+'-------------------------');
     	var rounds = []; 
 
-    	var waiting = names; 
+    	// var waiting = names; 
         for (var d = 0; d < graph.length; d++){
             var result = [];
             var firstV = graph[d];
             //here
             //var secondV = graph[2*d + 1];
-			if (firstV.neighbors.length == 0 || firstV.visited) continue;
+			if (firstV.neighbors.length == 0 || firstV.visited) {
+                continue;
+            }
 			
 			var secondIndex = longestNeibors(firstV,graph);
 			if (secondIndex == -1) continue;
             var secondV = graph[secondIndex];
             console.log(secondV);
 			
-            waiting.splice(names.indexOf(firstV.name));
-            waiting.splice(names.indexOf(secondV.name));            
+            // waiting.splice(names.indexOf(firstV.name));
+            // waiting.splice(names.indexOf(secondV.name));            
             var o1 = {key: firstV.name, value: secondV.name};
             var o2 = {key: secondV.name, value: firstV.name};
             result.push(o1);
@@ -153,6 +155,7 @@ function major (graph) {
             var firstRemoveIndex = firstV.neighbors.indexOf(secondV.name);
             if(firstRemoveIndex > -1) {
                 firstV.neighbors.splice(firstRemoveIndex, 1);
+                console.log("First Length:" + firstV.neighbors.length);
 				firstV.visited = true;
             } else {
             }
@@ -161,6 +164,7 @@ function major (graph) {
 
             if(secondRemoveIndex > -1 ) {       
                 secondV.neighbors.splice(secondRemoveIndex, 1);
+                console.log("Second Length:" + secondV.neighbors.length);
 				secondV.visited = true;
             } else {
             }
@@ -170,8 +174,9 @@ function major (graph) {
             return b.neighbors.length - a.neighbors.length ; 
         });
 		
-		for (var node in graph) {
-            node.visited = false;
+		for (var k = 0; k < graph.length; k++) {
+            console.log("revisit " + graph[k].neighbors.length);
+            graph[k].visited = false;
         }
     }
     //}
