@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>One On One Verdigris</title>
+	<link type="text/css" rel="stylesheet" href="stylesheet.css"/>
+	<script type="text/javascript" src="mydiv.js"></script>	
+</script>
+
+</head>
+	<body>
+		<div id='header'>
+			<a href="http://verdigris.co">
+					<img src="./logo.png"/>
+			</a>One On One Meeting
+		</div>
+
+		<div style="clear:both;"></div>
+
+		<div id='main'>
+			<p>
+				Schedule on: 
+				<script type="text/javascript">
+					document.write(new Date().toString().substring(0,25));
+				</script>
+			</p>
+			<p>
+				<label>Number of People: <input type="text" name="rows" id="numP"/></label>
+				<label>Start Time: <input type="text" name="time" id="startHour"/>pm</label>
+				<button type="button" onclick="insertTable()">Generate Table</button>
+			</p>
+		</div>
+		<div style="clear:both;"></div>
+		<div id='table'>
+			<table name="tableForm" id='table1'>
+			 	<div id="wrapper"></div>
+			</table>
+		</div>
+
+
+		
+	</body>
+</html>

@@ -1,0 +1,48 @@
+
+
+#table1 {
+	margin: 0 auto;
+	border: 1px solid black;
+  	border-spacing: 0;
+	width: 90%;
+}
+
+#table1 th{
+	border:1px solid #000000;
+	height: 30px;
+}
+#table1 td{
+	border:1px solid #000000;
+	height: 30px;
+	text-align: center;
+
+}
+
+#header {
+	margin-left: 50px;
+	font-size: 60px;
+}
+
+p {
+	text-align: center;
+	font-size: 24px;
+}
+
+img {
+	height:40%;
+	width: 35%;
+}
+
+body {
+	background-image:url('background.png');
+	color: white;
+
+#table {
+	text-align: center;
+}
+
+}
+body #main{
+	align : center;
+}
+
