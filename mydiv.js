@@ -1,63 +1,135 @@
-var names = ["Andrew","Chatty","David","John","Jon"];
-//var names = ['Andrew','Chatty','David','John','Jon','Mark','Martin','Patrick','Sue','Thomas','Will'];
+var names = ['Andrew','Chatty','David','John','Jon','Mark','Martin','Patrick','Sue','Thomas','Will'];
+
+function getStartDayOfWeek(weekNo){
+    var d1 = new Date();
+    numOfdaysPastSinceLastMonday = eval(d1.getDay()- 1);
+    d1.setDate(d1.getDate() - numOfdaysPastSinceLastMonday);
+    return d1;
+};
+
+function printHeadingRow (theader, numPeople, names) {
+    //Output names for table heading, ie, people's names
+    theader += "<th> " +" </th>";
+    for(var j = 0; j < numPeople; j++)
+    {
+      theader += "<th> "+ names[j] +" </th>";
+    }
+    return theader; 
+}
 
 function insertTable()
 {
+    //add/remove people
+    var addPerson = document.getElementById('addP').value;
+    if(addPerson) {names.push(addPerson);}
+    var removePerson = document.getElementById('removeP').value;
+    removePeople(removePerson); 
+    
+    var numPeople = names.length; 
+    var numWeeks = document.getElementById('weekNum').value;
+    var weekThrehold = Math.ceil(numPeople/numWeeks); 
     var startHr = document.getElementById('startHour').value;
-    var numPeople = document.getElementById('numP').value;
+    var hour = Number(startHr);
+    var minA =['40','00','20'];
+    var weekNum = 1; 
+    var currentWeekNum = (new Date()).getWeek(); 
+    var startDate = getStartDayOfWeek(currentWeekNum);
     var theader = "<table id='table1'>";
     var tbody = "";
-    var hour = Number(startHr)-1;
-    var min =0;
     var graph = buildGraph(numPeople);
     var finalResult = major(graph);
-	console.log(JSON.stringify(names));
-	console.log(Number(numPeople));
-    if (names.length === Number(numPeople)){
-    	//Output names for table heading
-        theader += "<th> " +" </th>";
-        for(var j = 0; j < numPeople; j++)
-        {
-          theader += "<th> "+ names[j] +" </th>";
+    names = shuffleArrayByWeekNum(currentWeekNum, numPeople);
+    theader += printHeadingRow (theader, numPeople, names); 
+
+    //Per row: 
+    var minCounter = 0; 
+    for(var i = 0; i < numPeople; ++i)
+    {
+        if (i% weekThrehold == 0){
+            hour = Number(startHr) - 1;
+            var spanNum = numPeople + 1; 
+            var endDate = new Date(); 
+            endDate.setDate(startDate.getDate() + 7);
+            tbody += "<tr>" + "<td colspan = \"" + spanNum + "\">";
+            tbody += ' Week ' + weekNum + ' : ';
+            tbody += "From " + startDate.toString().substring(0,15) + " To " + endDate.toString().substring(0,15); 
+            tbody += "</td>" + "</tr>";
+            weekNum ++ ; 
+            startDate = endDate; 
+            minCounter = 0; 
         }
 
-        for(var i = 0; i < numPeople; i++)
+        minCounter ++; 
+        //first column: setting time
+        min = minA[minCounter%3];
+        if ((minCounter-1)%3 == 0) {
+            hour++;
+        } 
+        tbody += "<tr>" + "<td>";
+        tbody += hour + ': ' + min;
+        tbody += "</td>"
+
+        //filling cells with data
+        for(var j = 1; j <= numPeople; j++)
         {
-            //first column: setting time
-            if (i%2 == 0) {
-                min = '00';
-                hour++;
-            } else {
-                min = '30';
-            }
-            tbody += "<tr>";
             tbody += "<td>";
-            tbody += hour + ': ' + min;
-            tbody += "</td>"
-
-            //filling cells with data
-            for(var j = 1; j <= numPeople; j++)
-            {
-                tbody += "<td>";
-                var round = finalResult[i];
-                for (var g = 0; g < round.length; g++){
-                	var meeting = round[g];
-                	if (names[j-1] == meeting[0].key){
-                		tbody += meeting[0].value;
-                	} else if (names[j-1] == meeting[1].key) {
-                		tbody += meeting[1].value;
-                	}
+            var round = finalResult[i];
+            for (var g = 0; g < round.length; g++){
+            	var meeting = round[g];
+            	if (names[j-1] == meeting[0].key){
+            		tbody += meeting[0].value;
+            	} else if (names[j-1] == meeting[1].key) {
+            		tbody += meeting[1].value;
             	}
-                tbody += "</td>"
-            }
-            tbody += "</tr>";
+        	}
+            tbody += "</td>"
         }
-        var tfooter = "</table>";
-        document.getElementById('wrapper').innerHTML = theader + tbody + tfooter;
-
-    } else {
-        alert('Entry number of people does not match number of engineers\' names in data. Please update array \'names\' first');
+        tbody += "</tr>";
     }
+    var tfooter = "</table>";
+    document.getElementById('schedule').innerHTML = theader + tbody + tfooter;
+    currentPeople();
+    cleanFields(); 
+}
+
+//Print current people in array so can have reference to input format of string for removing people
+function currentPeople () {
+    var msg = 'Current people are: ';
+    names.sort();
+    for (var i = 0; i < names.length; i++){
+        msg+= '  ' + names[i] + '  ';
+    }
+    document.getElementById('currentNames').innerHTML= msg;
+}
+
+Date.prototype.getWeek = function() {
+    var onejan = new Date(this.getFullYear(), 0, 1);
+    return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+}
+
+function shuffleArrayByWeekNum (currentWeekNum, numPeople) {
+    var startIndex = (Math.ceil(currentWeekNum/2) - 1 ) % numPeople;
+    var newStartArray = names.slice(startIndex);
+    var restArray = names.slice(0,startIndex);
+    names = newStartArray.concat(restArray);
+    return names;
+}
+
+function removePeople(removePerson){
+    if(removePerson) {
+        var removeIndex = names.indexOf(removePerson);
+        if(removeIndex > -1){
+            names.splice(removeIndex, 1);
+        } else {
+            alert('Remove name not found in list, Please refer to string format in the heading');
+        }
+     }
+     return true; 
+}
+
+function cleanFields(){
+    document.getElementById('addP').value='';
+    document.getElementById('removeP').value='';
 }
 
 function buildGraph (numPeople){
@@ -70,10 +142,10 @@ function buildGraph (numPeople){
 }
 
 function buildVertex (name, index, numPeople){
-    var result = {};
-    result.id = index;
-    result.name = name;
-	result.visited = false;
+    var vertex = {};
+    vertex.id = index;
+    vertex.name = name;
+	vertex.visited = false;
     var neighbors = [];
     for (var b = 0; b < numPeople; b++){
         if (b == index) {
@@ -81,11 +153,13 @@ function buildVertex (name, index, numPeople){
             neighbors.push(names[b]);
         }
     }
-    result.neighbors = neighbors;
-    return result;
+    vertex.neighbors = neighbors;
+    return vertex;
 }
 
-//returns true if there's edge left in graph
+//returns true if there's edge left in graph, that is,
+//any vertex's neighbors still have a member in it.
+//as condition check in major: while()
 function edgesLeft(graph){
     for (var c = 0; c < graph.length; c++){
         if (graph[c].neighbors.length > 0){
@@ -95,8 +169,8 @@ function edgesLeft(graph){
     return false;
 }
 
+//get vertex from its name in the graph, helper fn of longestNeibors
 function vertexByName (graph, name){
-
 	for (var k = 0; k < graph.length; k++){
 		if (name == graph[k].name){
 			return graph[k];
@@ -107,7 +181,8 @@ function vertexByName (graph, name){
 function longestNeibors (vertex, graph){
 	var edges = vertex.neighbors;
 	var max = 0;
-	var maxIndex = -1;
+    //-1 means not found, so paired up already
+	var maxIndex = -1; 
 	var pos = -1;
 	for (var h = 0; h < edges.length; h++){
 		var v = vertexByName(graph, edges[h]);
@@ -124,79 +199,49 @@ function longestNeibors (vertex, graph){
 
 function major (graph) {
     var finalResult = [];
-    //while (edgesLeft(graph)){
-    for (var i = 0; i < 5; i++){
-        console.log('--------------------'+i+'-------------------------');
+    while (edgesLeft(graph)){
     	var rounds = []; 
-
-    	// var waiting = names; 
         for (var d = 0; d < graph.length; d++){
             var result = [];
+            //the firstV is chosen from the 1st vertex with max # of undone edges in sorted graph 
             var firstV = graph[d];
-            //here
-            //var secondV = graph[2*d + 1];
 			if (firstV.neighbors.length == 0 || firstV.visited) {
                 continue;
             }
-			
+            //among the vertex's neighbors, return the neighbor vertex with longest neighbors
+            //eg: for vertex 'Andrew' with neighbors ['Chatty','John','Mark']
+            //each with neighbor.length of (3,7,4);
+            //then returns 'John' as secondV in function major
 			var secondIndex = longestNeibors(firstV,graph);
 			if (secondIndex == -1) continue;
             var secondV = graph[secondIndex];
-            console.log(secondV);
 			
-            // waiting.splice(names.indexOf(firstV.name));
-            // waiting.splice(names.indexOf(secondV.name));            
             var o1 = {key: firstV.name, value: secondV.name};
             var o2 = {key: secondV.name, value: firstV.name};
             result.push(o1);
             result.push(o2);
             rounds.push(result); 
 
+            //remove edges that have been paired. By removing people from the vertex's neighbor list
             var firstRemoveIndex = firstV.neighbors.indexOf(secondV.name);
             if(firstRemoveIndex > -1) {
                 firstV.neighbors.splice(firstRemoveIndex, 1);
-                console.log("First Length:" + firstV.neighbors.length);
 				firstV.visited = true;
-            } else {
-            }
- 
+            } 
             var secondRemoveIndex = secondV.neighbors.indexOf(firstV.name); 
-
             if(secondRemoveIndex > -1 ) {       
                 secondV.neighbors.splice(secondRemoveIndex, 1);
-                console.log("Second Length:" + secondV.neighbors.length);
 				secondV.visited = true;
-            } else {
-            }
+            } 
         }
         finalResult.push(rounds); 
         graph.sort(function(a,b){
             return b.neighbors.length - a.neighbors.length ; 
-        });
-		
+        });		
 		for (var k = 0; k < graph.length; k++) {
-            console.log("revisit " + graph[k].neighbors.length);
             graph[k].visited = false;
         }
     }
-    //}
-    console.log(graph); 
-    console.log(finalResult);
-    // finalResult =[ [[{key:'Andrew',value:'Chatty'},{key:'Chatty' ,value:'Andrew'}],
-    // 				[{key: 'David',value:'John' }, {key:'John' ,value:'David' }]
-    // 			   ],
-    // 				[[{key: 'Jon',value:'Andrew'}, {key:'Andrew' ,value:'Jon' }],
-    // 				[{key: 'Chatty',value:'David' }, {key:'David' ,value:'Chatty' }]
-    // 				],
-    // 				[[{key: 'John',value:'Jon'}, {key:'Jon' ,value:'John' }],
-    // 				[{key: 'Andrew',value:'David' }, {key:'David' ,value:'Andrew' }]
-    // 				],
-    // 				[[{key: 'Chatty',value:'John'}, {key:'John' ,value:'Chatty' }],
-    // 				[{key: 'David',value:'Jon' }, {key:'Jon' ,value:'David' }]
-    // 				],
-    // 				[[{key: 'Andrew',value:'John'}, {key:'John' ,value:'Andrew' }],
-    // 				[{key: 'Chatty',value:'Jon' }, {key:'Jon' ,value:'Chatty' }]]
-    // 			];
     return finalResult; 
 }
 

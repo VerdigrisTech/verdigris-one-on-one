@@ -29,8 +29,8 @@ p {
 }
 
 img {
-	height:40%;
-	width: 35%;
+	height:25%;
+	width: 25%;
 }
 
 body {
@@ -46,3 +46,17 @@ body #main{
 	align : center;
 }
 
+input {
+	width: 5%;
+}
+
+#hourNum{
+	width: 3%;
+}
+#startHour {
+	width: 3%;
+}
+
+span {
+	font-size: 20px; 
+}

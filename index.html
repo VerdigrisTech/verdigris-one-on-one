@@ -1,38 +1,41 @@
 <!DOCTYPE html>
-<html>
 <head>
+<html>
 	<title>One On One Verdigris</title>
 	<link type="text/css" rel="stylesheet" href="stylesheet.css"/>
 	<script type="text/javascript" src="mydiv.js"></script>	
 </script>
 
 </head>
-	<body>
+	<body onload="currentPeople()">
 		<div id='header'>
 			<a href="http://verdigris.co">
 					<img src="./logo.png"/>
 			</a>One On One Meeting
+				<span >
+					<script type="text/javascript">
+						document.write(new Date().toString().substring(0,25));
+					</script>
+				</span>			
 		</div>
 
 		<div style="clear:both;"></div>
 
-		<div id='main'>
+		<div id='main' >
+			<p id = "currentNames"></p>
 			<p>
-				Schedule on: 
-				<script type="text/javascript">
-					document.write(new Date().toString().substring(0,25));
-				</script>
-			</p>
-			<p>
-				<label>Number of People: <input type="text" name="rows" id="numP"/></label>
-				<label>Start Time: <input type="text" name="time" id="startHour"/>pm</label>
-				<button type="button" onclick="insertTable()">Generate Table</button>
+				<label>Start @ <input type="text" name="time" id="startHour"/> pm</label>
+				<label>for <input type="text" name="weekNum" id="weekNum"/> weeks. </label>
+				<label>Add: <input type="text" name="addPeople" id="addP"/></label>
+				<label>Remove: <input type="text" name="removePeople" id="removeP"/></label>
+				
+				<button  type="button" onclick="insertTable()">Generate Table</button>
 			</p>
 		</div>
 		<div style="clear:both;"></div>
 		<div id='table'>
 			<table name="tableForm" id='table1'>
-			 	<div id="wrapper"></div>
+			 	<div id="schedule"></div>
 			</table>
 		</div>
 
