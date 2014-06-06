@@ -50,7 +50,7 @@ function insertTable()
 
     var numPeople = names.length;
     var numWeeks = document.getElementById('weekNum').value;
-    var weekThrehold = Math.ceil(numPeople/numWeeks);
+    var weekThrehold = ((numPeople+1)/numWeeks);
 
     var startHr = document.getElementById('startHour').value;
     var hour = Number(startHr)
@@ -73,8 +73,7 @@ function insertTable()
     var minIndex = 0;
     for(var i = 0; i <= numPeople; i++)
     {
-        if (i% weekThrehold == 0){
-            document.getElementById('test').innerHTML += "haha" + i;
+        if (i% (weekThrehold) == 0){
             hour = startHr -1;
             var spanNum = numPeople + 1;
             var endDate = new Date();
