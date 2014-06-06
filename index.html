@@ -3,7 +3,7 @@
 <html>
 	<title>One On One Verdigris</title>
 	<link type="text/css" rel="stylesheet" href="stylesheet.css"/>
-	<script type="text/javascript" src="mydiv.js"></script>	
+	<script type="text/javascript" src="mydiv.js"></script>
 </script>
 
 </head>
@@ -16,30 +16,75 @@
 					<script type="text/javascript">
 						document.write(new Date().toString().substring(0,25));
 					</script>
-				</span>			
+				</span>
 		</div>
 
 		<div style="clear:both;"></div>
 
 		<div id='main' >
-			<p id = "currentNames"></p>
 			<p>
-				<label>Start @ <input type="text" name="time" id="startHour"/> pm</label>
-				<label>for <input type="text" name="weekNum" id="weekNum"/> weeks. </label>
-				<label>Add: <input type="text" name="addPeople" id="addP"/></label>
-				<label>Remove: <input type="text" name="removePeople" id="removeP"/></label>
-				
-				<button  type="button" onclick="insertTable()">Generate Table</button>
+				<label>
+					Start @
+					<select id='startHour'>
+					  <option value="1" selected='selected'>1</option>
+					  <option value="2">2</option>
+					  <option value="3">3</option>
+					  <option value="4">4</option>
+					  <option value="5">5</option>
+					</select>
+					 pm
+				</label>
+
+				<label>
+					every
+					<select id='timeInterval'>
+						<option value="20">20</option>
+					  <option value="30" selected='selected'>30</option>
+					</select>
+							minutes
+				</label>
+
+				<label>
+					for
+					<select id='weekNum'>
+					  <option value="1">1</option>
+					  <option value="2" selected='selected'>2</option>
+					  <option value="3">3</option>
+					</select>
+					 week(s)
+				</label>
+
+				<button  type="button" onclick="insertTable()">
+					Generate Table
+				</button>
 			</p>
 		</div>
+
 		<div style="clear:both;"></div>
+
 		<div id='table'>
 			<table name="tableForm" id='table1'>
 			 	<div id="schedule"></div>
 			</table>
 		</div>
 
+		<div id='footer'>
+			<p id = "currentNames"></p>
+			<p>
+				<label>
+					Add: <input type="text" name="addPeople" id="addP"/>
+				</label>
 
-		
+				<label>
+					Remove: <input type="text" name="removePeople" id="removeP"/>
+				</label>
+
+				</p><br>
+				<label id='test'>
+
+				</label>
+			</p>
+		</div>
+
 	</body>
 </html>

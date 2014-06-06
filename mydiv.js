@@ -14,7 +14,30 @@ function printHeadingRow (theader, numPeople, names) {
     {
       theader += "<th> "+ names[j] +" </th>";
     }
-    return theader; 
+    return theader;
+}
+
+function minSlots (interval) {
+    var len = 60/interval;
+    var result = [];
+    result[0] = '00';
+    for (var i = 1; i <= len; i++) {
+        result[i] = 60/len*i
+    }
+    if (interval == 30) {
+        shiftArray(result);
+    }
+
+    return result;
+}
+
+function shiftArray (slotArray) {
+    var result = [];
+    for (var i = 0; i < slotArray.length -1; i++){
+        result[i] = result[i+1];
+    }
+    result[length -1] = slotArray[0];
+    return result;
 }
 
 function insertTable()
@@ -23,48 +46,55 @@ function insertTable()
     var addPerson = document.getElementById('addP').value;
     if(addPerson) {names.push(addPerson);}
     var removePerson = document.getElementById('removeP').value;
-    removePeople(removePerson); 
-    
-    var numPeople = names.length; 
+    removePeople(removePerson);
+
+    var numPeople = names.length;
     var numWeeks = document.getElementById('weekNum').value;
-    var weekThrehold = Math.ceil(numPeople/numWeeks); 
+    var weekThrehold = Math.ceil(numPeople/numWeeks);
+
     var startHr = document.getElementById('startHour').value;
-    var hour = Number(startHr);
-    var minA =['40','00','20'];
-    var weekNum = 1; 
-    var currentWeekNum = (new Date()).getWeek(); 
+    var hour = Number(startHr)
+    var timeInterval = document.getElementById('timeInterval').value;
+
+    var minA = minSlots(timeInterval)
+
+    var weekNum = 1;
+    var currentWeekNum = (new Date()).getWeek();
     var startDate = getStartDayOfWeek(currentWeekNum);
     var theader = "<table id='table1'>";
     var tbody = "";
     var graph = buildGraph(numPeople);
     var finalResult = major(graph);
-    names = shuffleArrayByWeekNum(currentWeekNum, numPeople);
-    theader += printHeadingRow (theader, numPeople, names); 
 
-    //Per row: 
-    var minCounter = 0; 
-    for(var i = 0; i < numPeople; ++i)
+    names = shuffleArrayByWeekNum(currentWeekNum, numPeople);
+    theader += printHeadingRow (theader, numPeople, names);
+
+    //Per row:
+    var minIndex = 0;
+    for(var i = 0; i <= numPeople; i++)
     {
         if (i% weekThrehold == 0){
-            hour = Number(startHr) - 1;
-            var spanNum = numPeople + 1; 
-            var endDate = new Date(); 
+            document.getElementById('test').innerHTML += "haha" + i;
+            hour = startHr -1;
+            var spanNum = numPeople + 1;
+            var endDate = new Date();
             endDate.setDate(startDate.getDate() + 7);
-            tbody += "<tr>" + "<td colspan = \"" + spanNum + "\">";
+            tbody += "<tr class=\'highlight\'>" + "<td colspan = \"" + spanNum + "\">";
             tbody += ' Week ' + weekNum + ' : ';
-            tbody += "From " + startDate.toString().substring(0,15) + " To " + endDate.toString().substring(0,15); 
+            tbody += "From " + startDate.toString().substring(0,15) + " To " + endDate.toString().substring(0,15);
             tbody += "</td>" + "</tr>";
-            weekNum ++ ; 
-            startDate = endDate; 
-            minCounter = 0; 
+            weekNum ++ ;
+            startDate = endDate;
+            minIndex = 0;
         }
 
-        minCounter ++; 
+
         //first column: setting time
-        min = minA[minCounter%3];
-        if ((minCounter-1)%3 == 0) {
+        min = minA[minIndex%(60/timeInterval)];
+        minIndex ++;
+        if ((minIndex-1)%(60/timeInterval) == 0) {
             hour++;
-        } 
+        }
         tbody += "<tr>" + "<td>";
         tbody += hour + ': ' + min;
         tbody += "</td>"
@@ -89,12 +119,12 @@ function insertTable()
     var tfooter = "</table>";
     document.getElementById('schedule').innerHTML = theader + tbody + tfooter;
     currentPeople();
-    cleanFields(); 
+    cleanFields();
 }
 
 //Print current people in array so can have reference to input format of string for removing people
 function currentPeople () {
-    var msg = 'Current people are: ';
+    var msg = 'Current peers: ';
     names.sort();
     for (var i = 0; i < names.length; i++){
         msg+= '  ' + names[i] + '  ';
@@ -121,10 +151,10 @@ function removePeople(removePerson){
         if(removeIndex > -1){
             names.splice(removeIndex, 1);
         } else {
-            alert('Remove name not found in list, Please refer to string format in the heading');
+            alert('Remove name not found in list, Please refer to string format in the footer');
         }
      }
-     return true; 
+     return true;
 }
 
 function cleanFields(){
@@ -134,8 +164,8 @@ function cleanFields(){
 
 function buildGraph (numPeople){
     var vertices =[];
-    for (var a = 0; a < numPeople; a++){
-        var vertex = buildVertex(names[a],a,numPeople);
+    for (var i = 0; i < numPeople; i++){
+        var vertex = buildVertex(names[i],i,numPeople);
         vertices.push(vertex);
     }
     return vertices;
@@ -147,10 +177,10 @@ function buildVertex (name, index, numPeople){
     vertex.name = name;
 	vertex.visited = false;
     var neighbors = [];
-    for (var b = 0; b < numPeople; b++){
-        if (b == index) {
+    for (var i = 0; i < numPeople; i++){
+        if (i == index) {
         } else {
-            neighbors.push(names[b]);
+            neighbors.push(names[i]);
         }
     }
     vertex.neighbors = neighbors;
@@ -171,9 +201,9 @@ function edgesLeft(graph){
 
 //get vertex from its name in the graph, helper fn of longestNeibors
 function vertexByName (graph, name){
-	for (var k = 0; k < graph.length; k++){
-		if (name == graph[k].name){
-			return graph[k];
+	for (var i = 0; i < graph.length; i++){
+		if (name == graph[i].name){
+			return graph[i];
 		}
 	}
 }
@@ -182,7 +212,7 @@ function longestNeibors (vertex, graph){
 	var edges = vertex.neighbors;
 	var max = 0;
     //-1 means not found, so paired up already
-	var maxIndex = -1; 
+	var maxIndex = -1;
 	var pos = -1;
 	for (var h = 0; h < edges.length; h++){
 		var v = vertexByName(graph, edges[h]);
@@ -200,10 +230,10 @@ function longestNeibors (vertex, graph){
 function major (graph) {
     var finalResult = [];
     while (edgesLeft(graph)){
-    	var rounds = []; 
+    	var rounds = [];
         for (var d = 0; d < graph.length; d++){
             var result = [];
-            //the firstV is chosen from the 1st vertex with max # of undone edges in sorted graph 
+            //the firstV is chosen from the 1st vertex with max # of undone edges in sorted graph
             var firstV = graph[d];
 			if (firstV.neighbors.length == 0 || firstV.visited) {
                 continue;
@@ -215,33 +245,33 @@ function major (graph) {
 			var secondIndex = longestNeibors(firstV,graph);
 			if (secondIndex == -1) continue;
             var secondV = graph[secondIndex];
-			
+
             var o1 = {key: firstV.name, value: secondV.name};
             var o2 = {key: secondV.name, value: firstV.name};
             result.push(o1);
             result.push(o2);
-            rounds.push(result); 
+            rounds.push(result);
 
             //remove edges that have been paired. By removing people from the vertex's neighbor list
             var firstRemoveIndex = firstV.neighbors.indexOf(secondV.name);
             if(firstRemoveIndex > -1) {
                 firstV.neighbors.splice(firstRemoveIndex, 1);
 				firstV.visited = true;
-            } 
-            var secondRemoveIndex = secondV.neighbors.indexOf(firstV.name); 
-            if(secondRemoveIndex > -1 ) {       
+            }
+            var secondRemoveIndex = secondV.neighbors.indexOf(firstV.name);
+            if(secondRemoveIndex > -1 ) {
                 secondV.neighbors.splice(secondRemoveIndex, 1);
 				secondV.visited = true;
-            } 
+            }
         }
-        finalResult.push(rounds); 
+        finalResult.push(rounds);
         graph.sort(function(a,b){
-            return b.neighbors.length - a.neighbors.length ; 
-        });		
+            return b.neighbors.length - a.neighbors.length ;
+        });
 		for (var k = 0; k < graph.length; k++) {
             graph[k].visited = false;
         }
     }
-    return finalResult; 
+    return finalResult;
 }
 
