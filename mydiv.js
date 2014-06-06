@@ -50,7 +50,6 @@ function insertTable()
 
     var numPeople = names.length;
     var numWeeks = document.getElementById('weekNum').value;
-    var weekThrehold = ((numPeople+1)/numWeeks);
 
     var startHr = document.getElementById('startHour').value;
     var hour = Number(startHr)
@@ -65,13 +64,14 @@ function insertTable()
     var tbody = "";
     var graph = buildGraph(numPeople);
     var finalResult = major(graph);
+    var weekThrehold = (finalResult.length)/numWeeks;
 
     names = shuffleArrayByWeekNum(currentWeekNum, numPeople);
     theader += printHeadingRow (theader, numPeople, names);
 
     //Per row:
     var minIndex = 0;
-    for(var i = 0; i <= numPeople; i++)
+    for(var i = 0; i < finalResult.length; i++)
     {
         if (i% (weekThrehold) == 0){
             hour = startHr -1;
