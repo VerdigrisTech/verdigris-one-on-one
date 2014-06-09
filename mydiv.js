@@ -8,6 +8,7 @@ function getStartDayOfWeek(weekNo){
 };
 
 function printHeadingRow (theader, numPeople, names) {
+    names = names.sort();
     //Output names for table heading, ie, people's names
     theader += "<th> " +" </th>";
     for(var j = 0; j < numPeople; j++)
