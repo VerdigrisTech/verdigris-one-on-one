@@ -64,7 +64,7 @@ function insertTable()
     var tbody = "";
     var graph = buildGraph(numPeople);
     var finalResult = major(graph);
-    var weekThrehold = (finalResult.length)/numWeeks;
+    var weekThrehold = Math.ceil((finalResult.length)/numWeeks);
 
     names = shuffleArrayByWeekNum(currentWeekNum, numPeople);
     theader += printHeadingRow (theader, numPeople, names);
