@@ -1,7 +1,6 @@
-var names =
-    ['Andrew','Chatty','David','Jan', 'John','Jon','Luke',
-     'Mark','Martin','Patrick','Sue','Thomas','Will'
-    ];
+
+
+var names = ['Andrew','David','Jacques','Jon','Mark','Martin','Patrick','Sue','Thomas'];
 
 function getStartDayOfWeek(weekNo){
     var d1 = new Date();
