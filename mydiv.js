@@ -1,6 +1,4 @@
-
-
-var names = ['Andrew','David','Jacques','Jon','Luke','Mark','Martin','Patrick','Sue','Thomas'];
+var names = ['Andrew','David','Dawn','Jacques','Jan','Jon','Luke','Mark','Martin','Patrick','Sue','Thomas', 'Will'];
 
 function getStartDayOfWeek(weekNo){
     var d1 = new Date();
@@ -20,28 +18,33 @@ function printHeadingRow (theader, numPeople, names) {
     return theader;
 }
 
-function minSlots (interval) {
+function minSlots (interval, minutesIndex) {
     var len = 60/interval;
     var result = [];
     result[0] = '00';
-    for (var i = 1; i <= len; i++) {
+    var shiftCount = minutesIndex;
+
+    for (var i = 1; i < len; i++) {
         result[i] = 60/len*i
     }
-    if (interval == 30) {
-        shiftArray(result);
+
+    for (var j = 0; j < shiftCount; j++){
+        var newStartArray = result.slice(1,3);
+        var restArray = result.slice(0);
+        result = newStartArray.concat(restArray);
     }
 
     return result;
 }
 
-function shiftArray (slotArray) {
-    var result = [];
-    for (var i = 0; i < slotArray.length -1; i++){
-        result[i] = result[i+1];
-    }
-    result[length -1] = slotArray[0];
-    return result;
-}
+// function shiftArray (slotArray) {
+//     var result = [];
+//     for (var i = 0; i < slotArray.length -1; i++){
+//         result[i] = result[i+1];
+//     }
+//     result[length -1] = slotArray[0];
+//     return result;
+// }
 
 function insertTable()
 {
@@ -55,10 +58,13 @@ function insertTable()
     var numWeeks = document.getElementById('weekNum').value;
 
     var startHr = document.getElementById('startHour').value;
+    console.log(startHr);
     var hour = Number(startHr)
+    console.log(hour);
     var timeInterval = document.getElementById('timeInterval').value;
 
-    var minA = minSlots(timeInterval)
+    var minutesIndex = document.getElementById('minutesIndex').value;
+    var minA = minSlots(timeInterval, minutesIndex);
 
     var weekNum = 1;
     var currentWeekNum = (new Date()).getWeek();
@@ -74,16 +80,19 @@ function insertTable()
 
     //Per row:
     var minIndex = 0;
+    
     for(var i = 0; i < finalResult.length; i++)
     {
         if (i% (weekThrehold) == 0){
-            hour = startHr -1;
+            hour = startHr;    
+            console.log(startHr);        
             var spanNum = numPeople + 1;
             var endDate = new Date();
             endDate.setDate(startDate.getDate() + 7);
             tbody += "<tr class=\'highlight\'>" + "<td colspan = \"" + spanNum + "\">";
             tbody += ' Week ' + weekNum + ' : ';
-            tbody += "From " + startDate.toString().substring(0,15) + " To " + endDate.toString().substring(0,15);
+            tbody += "From " + startDate.toString().substring(0,15) + 
+                " To " + endDate.toString().substring(0,15);
             tbody += "</td>" + "</tr>";
             weekNum ++ ;
             startDate = endDate;
@@ -92,11 +101,13 @@ function insertTable()
 
 
         //first column: setting time
-        min = minA[minIndex%(60/timeInterval)];
-        minIndex ++;
-        if ((minIndex-1)%(60/timeInterval) == 0) {
+        min = minA[minIndex % ( 60 / timeInterval )];
+        minIndex++;
+
+        if(min == '00'){
             hour++;
         }
+
         tbody += "<tr>" + "<td>";
         tbody += hour + ': ' + min;
         tbody += "</td>"
@@ -136,7 +147,7 @@ function currentPeople () {
 
 Date.prototype.getWeek = function() {
     var onejan = new Date(this.getFullYear(), 0, 1);
-    return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+    return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 14);
 }
 
 function shuffleArrayByWeekNum (currentWeekNum, numPeople) {
