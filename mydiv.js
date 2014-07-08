@@ -29,22 +29,13 @@ function minSlots (interval, minutesIndex) {
     }
 
     for (var j = 0; j < shiftCount; j++){
-        var newStartArray = result.slice(1,3);
-        var restArray = result.slice(0);
-        result = newStartArray.concat(restArray);
+        var startArray = result.slice(1,3);
+        var restArray = result.slice(0,1);
+        result = startArray.concat(restArray);
     }
 
     return result;
 }
-
-// function shiftArray (slotArray) {
-//     var result = [];
-//     for (var i = 0; i < slotArray.length -1; i++){
-//         result[i] = result[i+1];
-//     }
-//     result[length -1] = slotArray[0];
-//     return result;
-// }
 
 function insertTable()
 {
@@ -58,9 +49,7 @@ function insertTable()
     var numWeeks = document.getElementById('weekNum').value;
 
     var startHr = document.getElementById('startHour').value;
-    console.log(startHr);
     var hour = Number(startHr)
-    console.log(hour);
     var timeInterval = document.getElementById('timeInterval').value;
 
     var minutesIndex = document.getElementById('minutesIndex').value;
@@ -78,36 +67,43 @@ function insertTable()
     names = shuffleArrayByWeekNum(currentWeekNum, numPeople);
     theader += printHeadingRow (theader, numPeople, names);
 
+    var flag = false;
+
     //Per row:
     var minIndex = 0;
     
     for(var i = 0; i < finalResult.length; i++)
     {
+        if (i % 3 == 0){
+            minIndex = 0; 
+        }
+        min = minA[minIndex];
+        console.log(minIndex);
+
+        if(min == '00' && flag){
+            hour++;
+        }
+        
+        flag = true; 
+
         if (i% (weekThrehold) == 0){
-            hour = startHr;    
-            console.log(startHr);        
+            hour = startHr; 
+            minIndex = 0;   
+            flag = false;
             var spanNum = numPeople + 1;
             var endDate = new Date();
             endDate.setDate(startDate.getDate() + 7);
             tbody += "<tr class=\'highlight\'>" + "<td colspan = \"" + spanNum + "\">";
             tbody += ' Week ' + weekNum + ' : ';
-            tbody += "From " + startDate.toString().substring(0,15) + 
+            tbody += "From " + startDate.toString().substring(0 , 15) + 
                 " To " + endDate.toString().substring(0,15);
             tbody += "</td>" + "</tr>";
             weekNum ++ ;
             startDate = endDate;
-            minIndex = 0;
         }
 
-
-        //first column: setting time
-        min = minA[minIndex % ( 60 / timeInterval )];
         minIndex++;
-
-        if(min == '00'){
-            hour++;
-        }
-
+        //first column: setting time   
         tbody += "<tr>" + "<td>";
         tbody += hour + ': ' + min;
         tbody += "</td>"
