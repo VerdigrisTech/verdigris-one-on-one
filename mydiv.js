@@ -1,4 +1,4 @@
-var names = ['Andrew','David','Dawn','Jacques','Jan','Jon','Luke','Mark','Martin','Patrick','Sue','Thomas', 'Will'];
+var names = ['Andrew','Chatty','David','Dawn','Jacques','Jan','Jon','Luke','Mark','Martin','Patrick','Sue','Thomas', 'Will'];
 
 function getStartDayOfWeek(weekNo){
     var d1 = new Date();
@@ -71,39 +71,42 @@ function insertTable()
 
     //Per row:
     var minIndex = 0;
-    
+
     for(var i = 0; i < finalResult.length; i++)
     {
-        if (i % 3 == 0){
-            minIndex = 0; 
-        }
-        min = minA[minIndex];
-        console.log(minIndex);
 
-        if(min == '00' && flag){
-            hour++;
-        }
-        
-        flag = true; 
 
         if (i% (weekThrehold) == 0){
-            hour = startHr; 
-            minIndex = 0;   
+            hour = startHr;
+            minIndex = 0;
             flag = false;
             var spanNum = numPeople + 1;
             var endDate = new Date();
             endDate.setDate(startDate.getDate() + 7);
             tbody += "<tr class=\'highlight\'>" + "<td colspan = \"" + spanNum + "\">";
             tbody += ' Week ' + weekNum + ' : ';
-            tbody += "From " + startDate.toString().substring(0 , 15) + 
+            tbody += "From " + startDate.toString().substring(0 , 15) +
                 " To " + endDate.toString().substring(0,15);
             tbody += "</td>" + "</tr>";
             weekNum ++ ;
             startDate = endDate;
         }
 
+        if (i % 3 == (weekNum - 2)){
+            minIndex = 0;
+        }
+        var min = minA[minIndex];
+
+        if(min == '00' && flag){
+            hour++;
+        }
+
+        flag = true;
+
         minIndex++;
-        //first column: setting time   
+        console.log(min);
+
+        //first column: setting time
         tbody += "<tr>" + "<td>";
         tbody += hour + ': ' + min;
         tbody += "</td>"
@@ -114,16 +117,17 @@ function insertTable()
             tbody += "<td>";
             var round = finalResult[i];
             for (var g = 0; g < round.length; g++){
-            	var meeting = round[g];
-            	if (names[j-1] == meeting[0].key){
-            		tbody += meeting[0].value;
-            	} else if (names[j-1] == meeting[1].key) {
-            		tbody += meeting[1].value;
-            	}
-        	}
+                var meeting = round[g];
+                if (names[j-1] == meeting[0].key){
+                    tbody += meeting[0].value;
+                } else if (names[j-1] == meeting[1].key) {
+                    tbody += meeting[1].value;
+                }
+            }
             tbody += "</td>"
         }
         tbody += "</tr>";
+
     }
     var tfooter = "</table>";
     document.getElementById('schedule').innerHTML = theader + tbody + tfooter;
@@ -184,7 +188,7 @@ function buildVertex (name, index, numPeople){
     var vertex = {};
     vertex.id = index;
     vertex.name = name;
-	vertex.visited = false;
+    vertex.visited = false;
     var neighbors = [];
     for (var i = 0; i < numPeople; i++){
         if (i == index) {
@@ -210,49 +214,49 @@ function edgesLeft(graph){
 
 //get vertex from its name in the graph, helper fn of longestNeibors
 function vertexByName (graph, name){
-	for (var i = 0; i < graph.length; i++){
-		if (name == graph[i].name){
-			return graph[i];
-		}
-	}
+    for (var i = 0; i < graph.length; i++){
+        if (name == graph[i].name){
+            return graph[i];
+        }
+    }
 }
 
 function longestNeibors (vertex, graph){
-	var edges = vertex.neighbors;
-	var max = 0;
+    var edges = vertex.neighbors;
+    var max = 0;
     //-1 means not found, so paired up already
-	var maxIndex = -1;
-	var pos = -1;
-	for (var h = 0; h < edges.length; h++){
-		var v = vertexByName(graph, edges[h]);
-		if (Number(v.neighbors.length) > max && !v.visited) {
-			max = Number(v.neighbors.length);
-			maxIndex = h;
-		}
-	}
-	if (maxIndex != -1) {
-		pos = graph.map(function(n) {return n.name;}).indexOf(edges[maxIndex]);
-	}
-	return pos;
+    var maxIndex = -1;
+    var pos = -1;
+    for (var h = 0; h < edges.length; h++){
+        var v = vertexByName(graph, edges[h]);
+        if (Number(v.neighbors.length) > max && !v.visited) {
+            max = Number(v.neighbors.length);
+            maxIndex = h;
+        }
+    }
+    if (maxIndex != -1) {
+        pos = graph.map(function(n) {return n.name;}).indexOf(edges[maxIndex]);
+    }
+    return pos;
 }
 
 function major (graph) {
     var finalResult = [];
     while (edgesLeft(graph)){
-    	var rounds = [];
+        var rounds = [];
         for (var d = 0; d < graph.length; d++){
             var result = [];
             //the firstV is chosen from the 1st vertex with max # of undone edges in sorted graph
             var firstV = graph[d];
-			if (firstV.neighbors.length == 0 || firstV.visited) {
+            if (firstV.neighbors.length == 0 || firstV.visited) {
                 continue;
             }
             //among the vertex's neighbors, return the neighbor vertex with longest neighbors
             //eg: for vertex 'Andrew' with neighbors ['Chatty','John','Mark']
             //each with neighbor.length of (3,7,4);
             //then returns 'John' as secondV in function major
-			var secondIndex = longestNeibors(firstV,graph);
-			if (secondIndex == -1) continue;
+            var secondIndex = longestNeibors(firstV,graph);
+            if (secondIndex == -1) continue;
             var secondV = graph[secondIndex];
 
             var o1 = {key: firstV.name, value: secondV.name};
@@ -265,22 +269,21 @@ function major (graph) {
             var firstRemoveIndex = firstV.neighbors.indexOf(secondV.name);
             if(firstRemoveIndex > -1) {
                 firstV.neighbors.splice(firstRemoveIndex, 1);
-				firstV.visited = true;
+                firstV.visited = true;
             }
             var secondRemoveIndex = secondV.neighbors.indexOf(firstV.name);
             if(secondRemoveIndex > -1 ) {
                 secondV.neighbors.splice(secondRemoveIndex, 1);
-				secondV.visited = true;
+                secondV.visited = true;
             }
         }
         finalResult.push(rounds);
         graph.sort(function(a,b){
             return b.neighbors.length - a.neighbors.length ;
         });
-		for (var k = 0; k < graph.length; k++) {
+        for (var k = 0; k < graph.length; k++) {
             graph[k].visited = false;
         }
     }
     return finalResult;
 }
-
