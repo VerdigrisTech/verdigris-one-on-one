@@ -1,5 +1,5 @@
-var names = ['Andrew','Chatty', 'David', 'John', 'Jan', 'Jacques','Jon','Mark',
-    'Martin','Patrick','Sue','Thomas', 'Will'];
+var names = ['Andrew','Chatty', 'David', 'John', 'Jan', 'Jacques','Jon',
+    'Luke', 'Mark','Martin','Patrick','Sue','Thomas', 'Will'];
 var halfNamesIndex = Math.ceil(names.length/2);
 
 Date.prototype.getWeek = function() {

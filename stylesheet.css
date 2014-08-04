@@ -2,14 +2,16 @@
 
 table {
 	margin: 0 auto;
-	border: 1px solid black;
+	border: 1px solid white;
   	border-spacing: 0;
 	width: 90%;
 	font-size: 18px;
+	text-align: center;
+
 }
 
 table th{
-	border:1px solid #000000;
+	border:1px solid black;
 	height: 30px;
 }
 table td{
@@ -44,10 +46,6 @@ img {
 body {
 	background-image:url('background.png');
 	color: white;
-
-#table {
-	text-align: center;
-}
 
 }
 body #main{
