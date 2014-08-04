@@ -1,15 +1,36 @@
-var names = ['Andrew','Chatty','David','Dawn','Jacques','Jan','Jon','Luke','Mark','Martin','Patrick','Sue','Thomas', 'Will'];
+var names = ['Andrew','Chatty', 'David', 'John', 'Jan', 'Jacques','Jon','Mark',
+    'Martin','Patrick','Sue','Thomas', 'Will'];
+var halfNamesIndex = Math.ceil(names.length/2);
+
+Date.prototype.getWeek = function() {
+    var onejan = new Date(this.getFullYear(), 0, 1);
+    return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+}
+
+var currentWeekNum = (new Date()).getWeek();
+var startDate = getStartDayOfWeek(currentWeekNum);
+names = shuffleArrayByWeekNum(currentWeekNum, names.length);
+var firstTable = names.slice(0, halfNamesIndex);
+var secondTable =names.slice(halfNamesIndex, names.length);
+
+function shuffleArrayByWeekNum (currentWeekNum, numPeople) {
+    var startIndex = (Math.ceil(currentWeekNum/2) - 1 ) % numPeople;
+    var newStartArray = names.slice(startIndex);
+    var restArray = names.slice(0,startIndex);
+    names = newStartArray.concat(restArray);
+    return names;
+}
 
 function getStartDayOfWeek(weekNo){
     var d1 = new Date();
-    numOfdaysPastSinceLastMonday = eval(d1.getDay()- 1);
-    d1.setDate(d1.getDate() - numOfdaysPastSinceLastMonday);
+    numOfdaysPastSinceLastThursday = eval(d1.getDay()- 4);
+    d1.setDate(d1.getDate() - numOfdaysPastSinceLastThursday);
     return d1;
 };
 
 function printHeadingRow (theader, numPeople, names) {
-    names = names.sort();
     //Output names for table heading, ie, people's names
+    names = names.sort()
     theader += "<th> " +" </th>";
     for(var j = 0; j < numPeople; j++)
     {
@@ -18,24 +39,24 @@ function printHeadingRow (theader, numPeople, names) {
     return theader;
 }
 
-function minSlots (interval, minutesIndex) {
+function minSlots (interval) {
     var len = 60/interval;
     var result = [];
     result[0] = '00';
-    var shiftCount = minutesIndex;
-
-    for (var i = 1; i < len; i++) {
+    for (var i = 1; i <= len; i++) {
         result[i] = 60/len*i
     }
-
-    for (var j = 0; j < shiftCount; j++){
-        var startArray = result.slice(1,3);
-        var restArray = result.slice(0,1);
-        result = startArray.concat(restArray);
-    }
-
     return result;
 }
+
+// function shiftArray (slotArray) {
+//     var result = [];
+//     for (var i = 0; i < slotArray.length -1; i++){
+//         result[i] = result[i+1];
+//     }
+//     result[length -1] = slotArray[0];
+//     return result;
+// }
 
 function insertTable()
 {
@@ -47,66 +68,47 @@ function insertTable()
 
     var numPeople = names.length;
     var numWeeks = document.getElementById('weekNum').value;
+    var weekThrehold = Math.ceil((numPeople+1)/4);
 
     var startHr = document.getElementById('startHour').value;
     var hour = Number(startHr)
     var timeInterval = document.getElementById('timeInterval').value;
 
-    var minutesIndex = document.getElementById('minutesIndex').value;
-    var minA = minSlots(timeInterval, minutesIndex);
+    var minA = minSlots(timeInterval)
 
     var weekNum = 1;
-    var currentWeekNum = (new Date()).getWeek();
-    var startDate = getStartDayOfWeek(currentWeekNum);
     var theader = "<table id='table1'>";
     var tbody = "";
     var graph = buildGraph(numPeople);
     var finalResult = major(graph);
-    var weekThrehold = Math.ceil((finalResult.length)/numWeeks);
 
-    names = shuffleArrayByWeekNum(currentWeekNum, numPeople);
     theader += printHeadingRow (theader, numPeople, names);
-
-    var flag = false;
 
     //Per row:
     var minIndex = 0;
-
     for(var i = 0; i < finalResult.length; i++)
     {
-
-
         if (i% (weekThrehold) == 0){
-            hour = startHr;
-            minIndex = 0;
-            flag = false;
+            hour = startHr -1;
             var spanNum = numPeople + 1;
             var endDate = new Date();
             endDate.setDate(startDate.getDate() + 7);
             tbody += "<tr class=\'highlight\'>" + "<td colspan = \"" + spanNum + "\">";
             tbody += ' Week ' + weekNum + ' : ';
-            tbody += "From " + startDate.toString().substring(0 , 15) +
-                " To " + endDate.toString().substring(0,15);
+            tbody += "From " + startDate.toString().substring(0,15) + " To " + endDate.toString().substring(0,15);
             tbody += "</td>" + "</tr>";
             weekNum ++ ;
             startDate = endDate;
-        }
-
-        if (i % 3 == (weekNum - 2)){
             minIndex = 0;
         }
-        var min = minA[minIndex];
 
-        if(min == '00' && flag){
-            hour++;
-        }
-
-        flag = true;
-
-        minIndex++;
-        console.log(min);
 
         //first column: setting time
+        min = minA[minIndex%(60/timeInterval)];
+        minIndex ++;
+        if ((minIndex-1)%(60/timeInterval) == 0) {
+            hour++;
+        }
         tbody += "<tr>" + "<td>";
         tbody += hour + ': ' + min;
         tbody += "</td>"
@@ -127,11 +129,12 @@ function insertTable()
             tbody += "</td>"
         }
         tbody += "</tr>";
-
     }
+
     var tfooter = "</table>";
     document.getElementById('schedule').innerHTML = theader + tbody + tfooter;
     currentPeople();
+    printTables();
     cleanFields();
 }
 
@@ -145,18 +148,21 @@ function currentPeople () {
     document.getElementById('currentNames').innerHTML= msg;
 }
 
-Date.prototype.getWeek = function() {
-    var onejan = new Date(this.getFullYear(), 0, 1);
-    return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 14);
+function printTables () {
+    var msg1 = 'Lunch Table A: ';
+    for (var i = 0; i < firstTable.length; i++) {
+        msg1 += firstTable[i] + '  ';
+    }
+    document.getElementById('firstTable').innerHTML= "<tr><td>" + msg1+"</td></tr>";
+
+    var msg2 = 'Lunch Table B: ';
+    for (var j = 0; j < secondTable.length; j++) {
+        msg2 += secondTable[j] + '  ';
+    }
+    document.getElementById('secondTable').innerHTML= "<tr><td>" + msg2+"</td></tr>";
 }
 
-function shuffleArrayByWeekNum (currentWeekNum, numPeople) {
-    var startIndex = (Math.ceil(currentWeekNum/2) - 1 ) % numPeople;
-    var newStartArray = names.slice(startIndex);
-    var restArray = names.slice(0,startIndex);
-    names = newStartArray.concat(restArray);
-    return names;
-}
+
 
 function removePeople(removePerson){
     if(removePerson) {
@@ -242,6 +248,41 @@ function longestNeibors (vertex, graph){
 
 function major (graph) {
     var finalResult = [];
+    var i, j;
+
+    firstTable = new Array();
+    secondTable = new Array();
+    var half = Math.floor(names.length/2);
+
+    for (i = 0; i < half; i++) {
+        firstTable.push(names[i]);
+        for (j = i + 1; j < half; j++) {
+            var firstNeighbourIndex = graph[i].neighbors.indexOf(graph[j].name);
+            if(firstNeighbourIndex > -1) {
+                graph[i].neighbors.splice(firstNeighbourIndex, 1);
+            }
+            var secondNeighbourIndex = graph[j].neighbors.indexOf(graph[i].name);
+            if(secondNeighbourIndex > -1 ) {
+                graph[j].neighbors.splice(secondNeighbourIndex, 1);
+            }
+        }
+    }
+
+    for (i = half; i < names.length; i++) {
+        secondTable.push(names[i]);
+        for (j = i + 1; j < names.length; j++) {
+            var firstNeighbourIndex = graph[i].neighbors.indexOf(graph[j].name);
+            if(firstNeighbourIndex > -1) {
+                graph[i].neighbors.splice(firstNeighbourIndex, 1);
+            }
+            var secondNeighbourIndex = graph[j].neighbors.indexOf(graph[i].name);
+            if(secondNeighbourIndex > -1 ) {
+                graph[j].neighbors.splice(secondNeighbourIndex, 1);
+            }
+        }
+    }
+
+
     while (edgesLeft(graph)){
         var rounds = [];
         for (var d = 0; d < graph.length; d++){
@@ -287,3 +328,4 @@ function major (graph) {
     }
     return finalResult;
 }
+

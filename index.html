@@ -1,95 +1,94 @@
 <!DOCTYPE html>
 <head>
 <html>
-	<title>One On One Verdigris</title>
-	<link type="text/css" rel="stylesheet" href="stylesheet.css"/>
-	<scriot src="moment.js"/>
-	<script type="text/javascript" src="mydiv.js"></script>
+    <title>One On One Verdigris</title>
+    <link type="text/css" rel="stylesheet" href="stylesheet.css"/>
+    <script type="text/javascript" src="mydiv.js"></script>
 </script>
 
 </head>
-	<body onload="currentPeople()">
-		<div id='header'>
-			<a href="http://verdigris.co">
-				<img src="./logo.png"/>
-			</a>
-			One On One Meeting
-			<span >
-				<script type="text/javascript">
-					document.write(new Date().toString().substring(0,25));
-				</script>
-			</span>
-		</div>
+    <body onload="currentPeople()">
+        <div id='header'>
+            <a href="http://verdigris.co">
+                    <img src="./logo.png"/>
+            </a>One On One Meeting
+                <span >
+                    <script type="text/javascript">
+                        document.write(new Date().toString().substring(0,25));
+                    </script>
+                </span>
+        </div>
 
-		<div style="clear:both;"></div>
+        <div style="clear:both;"></div>
 
-		<div id='main' >
-			<p>
-				<label>
-					Start @
-					<select id='startHour'>
-					  <option value="1">1</option>
-					  <option value="2">2</option>
-					  <option value="3" selected='selected'>3</option>
-					  <option value="4">4</option>
-					</select>
-					 :
-				</label>
-				<label>
-					<select id='minutesIndex'>
-					  <option value="0">00</option>
-					  <option value="1">20</option>
-					  <option value="2">40</option>
-					</select>
-					 pm
-				</label>
+        <div id='main' >
+            <p>
+                <label>
+                    Start @
+                    <select id='startHour'>
+                      <option value="11" selected='selected'>11</option>
+                      <option value="12">12</option>
+                    </select>
+                     am
+                </label>
 
-				<label>
-					every
-					<select id='timeInterval'>
-						<option value="20" selected='selected'>20</option>
-					</select>
-							minutes
-				</label>
+                <label>
+                    every
+                    <select id='timeInterval'>
+                        <option value="20" selected='selected'>20</option>
+                      <option value="30">30</option>
+                    </select>
+                            minutes
+                </label>
 
-				<label>
-					for
-					<select id='weekNum'>
-					  <option value="1">1</option>
-					  <option value="2" selected='selected'>2</option>
-					  <option value="3">3</option>
-					</select>
-					 week(s)
-				</label>
+                <label>
+                    for
+                    <select id='weekNum'>
+                      <option value="1">1</option>
+                      <option value="2" selected='selected'>2</option>
+                      <option value="3">3</option>
+                    </select>
+                     week(s)
+                </label>
 
-				<button  type="button" onclick="insertTable()">
-					Generate Table
-				</button>
-			</p>
-		</div>
+                <button  type="button" onclick="insertTable()">
+                    Generate Table
+                </button>
+            </p>
+        </div>
 
-		<div style="clear:both;"></div>
+        <div style="clear:both;"></div>
 
-		<div id='table'>
-			<table name="tableForm" id='table1'>
-			 	<div id="schedule"></div>
-			</table>
-		</div>
+        <div id='table2'>
+            <table name="tableForm" id='firstTable'>
+            </table>
+        </div>
+        <div id='table3'>
+            <table name="tableForm" id='secondTable'>
+            </table>
+        </div>
+        <div></div>
+        <div id='table1'>
+            <table name="tableForm" id='table1'>
+                <div id="schedule"></div>
+            </table>
+        </div>
 
-		<div id='footer'>
-			<p id = "currentNames"></p>
-			<p>
-				<label>
-					Add: <input type="text" name="addPeople" id="addP"/>
-				</label>
+        <div id='footer'>
+            <p id = "currentNames"></p>
+            <p>
+                <label>
+                    Add: <input type="text" name="addPeople" id="addP"/>
+                </label>
 
-				<label>
-					Remove: <input type="text" name="removePeople" id="removeP"/>
-				</label>
+                <label>
+                    Remove: <input type="text" name="removePeople" id="removeP"/>
+                </label>
 
-				</p><br>
-			</p>
-		</div>
+                </p><br>
 
-	</body>
+            </p>
+        </div>
+
+    </body>
 </html>
