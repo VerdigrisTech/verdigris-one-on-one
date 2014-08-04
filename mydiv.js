@@ -1,17 +1,13 @@
 var names = ['Andrew','Chatty', 'David', 'John', 'Jan', 'Jacques','Jon',
     'Luke', 'Mark','Martin','Patrick','Sue','Thomas', 'Will'];
-var halfNamesIndex = Math.ceil(names.length/2);
 
+//Get week based on current date
 Date.prototype.getWeek = function() {
     var onejan = new Date(this.getFullYear(), 0, 1);
     return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 7);
 }
-
-var currentWeekNum = (new Date()).getWeek();
-var startDate = getStartDayOfWeek(currentWeekNum);
-names = shuffleArrayByWeekNum(currentWeekNum, names.length);
-var firstTable = names.slice(0, halfNamesIndex);
-var secondTable =names.slice(halfNamesIndex, names.length);
+//currentWeekNum increment every 2 weeks so that schedule does not change
+var currentWeekNum = Math.floor(new Date().getWeek()/2);
 
 function shuffleArrayByWeekNum (currentWeekNum, numPeople) {
     var startIndex = (Math.ceil(currentWeekNum/2) - 1 ) % numPeople;
@@ -28,11 +24,11 @@ function getStartDayOfWeek(weekNo){
     return d1;
 };
 
-function printHeadingRow (theader, numPeople, names) {
+function printHeadingRow (theader, names) {
     //Output names for table heading, ie, people's names
     names = names.sort()
     theader += "<th> " +" </th>";
-    for(var j = 0; j < numPeople; j++)
+    for(var j = 0; j < names.length; j++)
     {
       theader += "<th> "+ names[j] +" </th>";
     }
@@ -49,15 +45,6 @@ function minSlots (interval) {
     return result;
 }
 
-// function shiftArray (slotArray) {
-//     var result = [];
-//     for (var i = 0; i < slotArray.length -1; i++){
-//         result[i] = result[i+1];
-//     }
-//     result[length -1] = slotArray[0];
-//     return result;
-// }
-
 function insertTable()
 {
     //add/remove people
@@ -72,6 +59,7 @@ function insertTable()
     var startHr = document.getElementById('startHour').value;
     var hour = Number(startHr)
     var timeInterval = document.getElementById('timeInterval').value;
+    var startDate = getStartDayOfWeek(currentWeekNum);
 
     var minA = minSlots(timeInterval)
 
@@ -81,7 +69,7 @@ function insertTable()
     var graph = buildGraph(numPeople);
     var finalResult = major(graph);
 
-    theader += printHeadingRow (theader, numPeople, names);
+    theader += printHeadingRow (theader, names);
 
     //Per row:
     var minIndex = 0;
@@ -92,7 +80,7 @@ function insertTable()
             var spanNum = numPeople + 1;
             var endDate = new Date();
             endDate.setDate(startDate.getDate() + 7);
-            tbody += "<tr class=\'highlight\'>" + "<td colspan = \"" + spanNum + "\">";
+            tbody += "<tr>" + "<td id='highlight' colspan = \"" + spanNum + "\">";
             tbody += ' Week ' + weekNum + ' : ';
             tbody += "From " + startDate.toString().substring(0,15) + " To " + endDate.toString().substring(0,15);
             tbody += "</td>" + "</tr>";
@@ -252,6 +240,7 @@ function major (graph) {
     firstTable = new Array();
     secondTable = new Array();
     var half = Math.floor(names.length/2);
+    names = shuffleArrayByWeekNum(currentWeekNum, names.length);
 
     for (i = 0; i < half; i++) {
         firstTable.push(names[i]);

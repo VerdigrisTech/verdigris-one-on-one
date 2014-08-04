@@ -7,7 +7,10 @@ table {
 	width: 90%;
 	font-size: 18px;
 	text-align: center;
-
+}
+table.outset {
+	border-style: outset;
+	border-width: 3px;
 }
 
 table th{
@@ -21,11 +24,12 @@ table td{
 }
 
 
-}
-tr.highlight {
+#highlight {
 	background-color: #336699;
-	height: 40px;
-	font-size: 20px;
+opacity: 0.7;
+color: white;
+	/*height: 40px;
+	font-size: 20px;*/
 }
 
 #header {
@@ -60,7 +64,7 @@ input {
 	width: 3%;
 }
 #startHour {
-	width: 3%;
+	width: 4%;
 }
 
 span {
