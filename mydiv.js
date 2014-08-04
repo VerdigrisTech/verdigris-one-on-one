@@ -80,7 +80,7 @@ function insertTable()
             var spanNum = numPeople + 1;
             var endDate = new Date();
             endDate.setDate(startDate.getDate() + 7);
-            tbody += "<tr>" + "<td id='highlight' colspan = \"" + spanNum + "\">";
+            tbody += "<tr>" + "<td class='highlight' colspan = \"" + spanNum + "\">";
             tbody += ' Week ' + weekNum + ' : ';
             tbody += "From " + startDate.toString().substring(0,15) + " To " + endDate.toString().substring(0,15);
             tbody += "</td>" + "</tr>";

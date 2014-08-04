@@ -24,7 +24,7 @@ table td{
 }
 
 
-#highlight {
+.highlight {
 	background-color: #336699;
 opacity: 0.7;
 color: white;
