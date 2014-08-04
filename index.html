@@ -26,8 +26,8 @@
                 <label>
                     Start @
                     <select id='startHour'>
-                      <option value="11" selected='selected'>11</option>
                       <option value="12">12</option>
+                      <option value="11" selected='selected'>11</option>
                     </select>
                      am
                 </label>
@@ -41,16 +41,6 @@
                             minutes
                 </label>
 
-                <label>
-                    for
-                    <select id='weekNum'>
-                      <option value="1">1</option>
-                      <option value="2" selected='selected'>2</option>
-                      <option value="3">3</option>
-                    </select>
-                     week(s)
-                </label>
-
                 <button  type="button" onclick="insertTable()">
                     Generate Table
                 </button>
@@ -58,16 +48,29 @@
         </div>
 
         <div style="clear:both;"></div>
-
-        <div id='table2'>
-            <table name="tableForm" id='firstTable'>
+        <div>
+            <table>
+                <th>Lunch Table A Members:
+                </th>
+                <th>Lunch Table B Members:
+                </th>
+                <tbody>
+                    <td>
+                    <div id='table2'>
+                        <table name="tableForm" id='firstTable'>
+                        </table>
+                    </div>
+                    </td>
+                    <td>
+                    <div id='table3'>
+                        <table name="tableForm" id='secondTable'>
+                        </table>
+                    </div>
+                    </td>
+                </tbody>
             </table>
         </div>
-        <div id='table3'>
-            <table name="tableForm" id='secondTable'>
-            </table>
-        </div>
-        <div></div>
+        <br>
         <div id='table1'>
             <table name="tableForm" id='table1'>
                 <div id="schedule"></div>

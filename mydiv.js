@@ -67,7 +67,6 @@ function insertTable()
     removePeople(removePerson);
 
     var numPeople = names.length;
-    var numWeeks = document.getElementById('weekNum').value;
     var weekThrehold = Math.ceil((numPeople+1)/4);
 
     var startHr = document.getElementById('startHour').value;
@@ -149,13 +148,13 @@ function currentPeople () {
 }
 
 function printTables () {
-    var msg1 = 'Lunch Table A: ';
+    var msg1 = '';
     for (var i = 0; i < firstTable.length; i++) {
         msg1 += firstTable[i] + '  ';
     }
     document.getElementById('firstTable').innerHTML= "<tr><td>" + msg1+"</td></tr>";
 
-    var msg2 = 'Lunch Table B: ';
+    var msg2 = '';
     for (var j = 0; j < secondTable.length; j++) {
         msg2 += secondTable[j] + '  ';
     }
