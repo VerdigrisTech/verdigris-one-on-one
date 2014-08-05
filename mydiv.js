@@ -1,5 +1,6 @@
-var names = ['Andrew','Chatty', 'David', 'John', 'Jan', 'Jacques','Jon',
-    'Luke', 'Mark','Martin','Patrick','Sue','Thomas', 'Will'];
+var names = ['Andrew','Chatty', 'David', 'Dawn', 'John',
+    'Jan', 'Jacques','Jon', 'Luke', 'Mark',
+    'Martin','Patrick','Sue','Thomas', 'Will'];
 
 //Get week based on current date
 Date.prototype.getWeek = function() {
@@ -75,7 +76,7 @@ function insertTable()
     var minIndex = 0;
     for(var i = 0; i < finalResult.length; i++)
     {
-        if (i% (weekThrehold) == 0){
+        if (i% weekThrehold == 0 && weekNum<=2){
             hour = startHr -1;
             var spanNum = numPeople + 1;
             var endDate = new Date();
