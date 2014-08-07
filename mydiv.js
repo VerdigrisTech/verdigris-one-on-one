@@ -45,13 +45,16 @@ function getStartDayOfWeek(weekNo){
     return d1;
 };
 
-function printHeadingRow (theader, names) {
+function printHeadingRow (theader, table) {
     //Output names for table heading, ie, people's names
     theader += "<th> " +" </th>";
-    for(var j = 0; j < names.length; j++)
+    for(var i = 0; i < table.length; i++)
     {
-      theader += "<th> "+ names[j] +" </th>";
+        for(var j = 0; j < table[i].length; j++){
+            theader += "<th> "+ table[i][j] +" </th>";
+        }
     }
+    console.log(theader);
     return theader;
 }
 
@@ -93,7 +96,7 @@ function insertTable()
 
     var finalResult = major(graph);
 
-    theader += printHeadingRow (theader, names);
+    theader += printHeadingRow (theader, tables);
 
     //Per row:
     var minIndex = 0;
