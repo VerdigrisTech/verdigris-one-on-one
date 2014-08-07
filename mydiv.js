@@ -54,7 +54,6 @@ function printHeadingRow (theader, table) {
             theader += "<th> "+ table[i][j] +" </th>";
         }
     }
-    console.log(theader);
     return theader;
 }
 
@@ -65,6 +64,22 @@ function minSlots (interval) {
     for (var i = 1; i <= len; i++) {
         result[i] = 60/len*i
     }
+    return result;
+}
+
+function lunchPairing(table){
+    var row1 = [table[1], table[0], table[3], table[2]];
+    var row2 = [table[2], table[3], table[0], table[1]];
+    var row3 = [table[3], table[2], table[1], table[0]];
+    return [row1, row2, row3];
+}
+
+function lunchPairings(tables){
+    var result = [];
+    for (var i = 0; i < tables.length; i++){
+        result.push(lunchPairing(tables[i]));
+    }
+    console.log(result);
     return result;
 }
 
@@ -97,7 +112,7 @@ function insertTable()
     var finalResult = major(graph);
 
     theader += printHeadingRow (theader, tables);
-
+    lunchPairings(tables);
     //Per row:
     var minIndex = 0;
     for(var i = 0; i < finalResult.length; i++)
