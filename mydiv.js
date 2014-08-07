@@ -1,6 +1,6 @@
-var names = ['Andrew', 'Chatty', 'David', 'Dawn', 'John',
-    'Jan', 'Jacques', 'Jon', 'Luke', 'Mark',
-    'Martin', 'Patrick', 'Sue', 'Thomas', 'Will'];
+var names = ['Andrew', 'Chatty', 'David', 'Dawn', 'Jacques',
+    'Jan', 'John', 'Jon', 'Luke', 'Mark',
+    'Martin', 'Patrick', 'Sue', 'Thomas', 'Will', 'N/A'];
 var tableNo = Math.ceil(names.length/4);
 var table1 = [];
 var table2 = [];
@@ -20,6 +20,8 @@ function dispatchToTables () {
             table4.push(names[i]);
         }
     }
+    console.log('tables');
+    console.log([table1, table2, table3, table4]);
     return tables = [table1, table2, table3, table4];
 }
 //Get week based on current date
@@ -79,8 +81,36 @@ function lunchPairings(tables){
     for (var i = 0; i < tables.length; i++){
         result.push(lunchPairing(tables[i]));
     }
-    console.log(result);
+    var a = flatLunchTableRows(result);
     return result;
+}
+
+function flatToRow (complexArray, index){
+    var result = [];
+    var row = [];
+    for (var j = 0; j < 4; j++){
+        result.push(complexArray[j][index]);
+    }
+    console.log (result);
+    for (var i = 0; i < 4; i++){
+        for(var k = 0; k < result[i].length; k++){
+            row.push(result[i][k]);
+        }
+    }
+    return row;
+}
+
+function flatLunchTableRows (complexArray){
+    var lunchRows = [];
+    for (var i = 0; i < 3; i++){
+        lunchRows.push(flatToRow(complexArray, i));
+    }
+    console.log(lunchRows);
+    return lunchRows;
+}
+function doubleTable (table1, table2){
+    var result = [];
+
 }
 
 function insertTable()
@@ -170,7 +200,6 @@ function insertTable()
 //Print current people in array so can have reference to input format of string for removing people
 function currentPeople () {
     var msg = 'Current peers: ';
-    names.sort();
     for (var i = 0; i < names.length; i++){
         msg+= '  ' + names[i] + '  ';
     }
