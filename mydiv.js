@@ -1,112 +1,125 @@
-var names = ['Andrew','Chatty','David','Dawn','Jacques','Jan','Jon','Luke','Mark','Martin','Patrick','Sue','Thomas', 'Will'];
+var names = ['Andrew', 'Chatty', 'David', 'Dawn', 'John',
+    'Jan', 'Jacques', 'Jon', 'Luke', 'Mark',
+    'Martin', 'Patrick', 'Sue', 'Thomas', 'Will'];
+var tableNo = Math.ceil(names.length/4);
+var table1 = [];
+var table2 = [];
+var table3 = [];
+var table4 = [];
+var tables = [];
+
+function dispatchToTables () {
+    for (var i = 0; i < names.length; i++){
+        if(i % tableNo == 0){
+            table1.push(names[i]);
+        } else if(i % tableNo == 1){
+            table2.push(names[i]);
+        } else if(i % tableNo == 2){
+            table3.push(names[i]);
+        } else{
+            table4.push(names[i]);
+        }
+    }
+    return tables = [table1, table2, table3, table4];
+}
+//Get week based on current date
+Date.prototype.getWeek = function() {
+    var onejan = new Date(this.getFullYear(), 0, 1);
+    return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+}
+//currentWeekNum increment every 2 weeks so that schedule does not change
+var currentWeekNum = Math.floor(new Date().getWeek()/2);
+
+function shuffleArrayByWeekNum (currentWeekNum, numPeople) {
+    var startIndex = (Math.ceil(currentWeekNum/2) - 1 ) % numPeople;
+    var newStartArray = names.slice(startIndex);
+    var restArray = names.slice(0,startIndex);
+    names = newStartArray.concat(restArray);
+    return names;
+}
 
 function getStartDayOfWeek(weekNo){
     var d1 = new Date();
-    numOfdaysPastSinceLastMonday = eval(d1.getDay()- 1);
-    d1.setDate(d1.getDate() - numOfdaysPastSinceLastMonday);
+    numOfdaysPastSinceLastThursday = eval(d1.getDay()- 4);
+    d1.setDate(d1.getDate() - numOfdaysPastSinceLastThursday);
     return d1;
 };
 
-function printHeadingRow (theader, numPeople, names) {
-    names = names.sort();
+function printHeadingRow (theader, names) {
     //Output names for table heading, ie, people's names
     theader += "<th> " +" </th>";
-    for(var j = 0; j < numPeople; j++)
+    for(var j = 0; j < names.length; j++)
     {
       theader += "<th> "+ names[j] +" </th>";
     }
     return theader;
 }
 
-function minSlots (interval, minutesIndex) {
+function minSlots (interval) {
     var len = 60/interval;
     var result = [];
     result[0] = '00';
-    var shiftCount = minutesIndex;
-
-    for (var i = 1; i < len; i++) {
+    for (var i = 1; i <= len; i++) {
         result[i] = 60/len*i
     }
-
-    for (var j = 0; j < shiftCount; j++){
-        var startArray = result.slice(1,3);
-        var restArray = result.slice(0,1);
-        result = startArray.concat(restArray);
-    }
-
     return result;
 }
 
 function insertTable()
 {
     //add/remove people
+    reset();
     var addPerson = document.getElementById('addP').value;
     if(addPerson) {names.push(addPerson);}
     var removePerson = document.getElementById('removeP').value;
     removePeople(removePerson);
 
     var numPeople = names.length;
-    var numWeeks = document.getElementById('weekNum').value;
+    var weekThrehold = Math.ceil((numPeople+1)/4);
 
     var startHr = document.getElementById('startHour').value;
     var hour = Number(startHr)
     var timeInterval = document.getElementById('timeInterval').value;
+    var startDate = getStartDayOfWeek(currentWeekNum);
 
-    var minutesIndex = document.getElementById('minutesIndex').value;
-    var minA = minSlots(timeInterval, minutesIndex);
+    var minA = minSlots(timeInterval)
 
     var weekNum = 1;
-    var currentWeekNum = (new Date()).getWeek();
-    var startDate = getStartDayOfWeek(currentWeekNum);
     var theader = "<table id='table1'>";
     var tbody = "";
     var graph = buildGraph(numPeople);
+    // names = shuffleArrayByWeekNum(currentWeekNum, names.length);
+    dispatchToTables();
+
     var finalResult = major(graph);
-    var weekThrehold = Math.ceil((finalResult.length)/numWeeks);
 
-    names = shuffleArrayByWeekNum(currentWeekNum, numPeople);
-    theader += printHeadingRow (theader, numPeople, names);
-
-    var flag = false;
+    theader += printHeadingRow (theader, names);
 
     //Per row:
     var minIndex = 0;
-
     for(var i = 0; i < finalResult.length; i++)
     {
-
-
-        if (i% (weekThrehold) == 0){
-            hour = startHr;
-            minIndex = 0;
-            flag = false;
+        if (i% weekThrehold == 0 ){
+            hour = startHr -1;
             var spanNum = numPeople + 1;
             var endDate = new Date();
             endDate.setDate(startDate.getDate() + 7);
-            tbody += "<tr class=\'highlight\'>" + "<td colspan = \"" + spanNum + "\">";
+            tbody += "<tr>" + "<td class='highlight' colspan = \"" + spanNum + "\">";
             tbody += ' Week ' + weekNum + ' : ';
-            tbody += "From " + startDate.toString().substring(0 , 15) +
-                " To " + endDate.toString().substring(0,15);
+            tbody += "From " + startDate.toString().substring(0,15) + " To " + endDate.toString().substring(0,15);
             tbody += "</td>" + "</tr>";
             weekNum ++ ;
             startDate = endDate;
-        }
-
-        if (i % 3 == (weekNum - 2)){
             minIndex = 0;
         }
-        var min = minA[minIndex];
 
-        if(min == '00' && flag){
-            hour++;
-        }
-
-        flag = true;
-
-        minIndex++;
-        console.log(min);
 
         //first column: setting time
+        min = minA[minIndex%(60/timeInterval)];
+        minIndex ++;
+        if ((minIndex-1)%(60/timeInterval) == 0) {
+            hour++;
+        }
         tbody += "<tr>" + "<td>";
         tbody += hour + ': ' + min;
         tbody += "</td>"
@@ -127,11 +140,12 @@ function insertTable()
             tbody += "</td>"
         }
         tbody += "</tr>";
-
     }
+
     var tfooter = "</table>";
     document.getElementById('schedule').innerHTML = theader + tbody + tfooter;
     currentPeople();
+    printTables();
     cleanFields();
 }
 
@@ -145,17 +159,18 @@ function currentPeople () {
     document.getElementById('currentNames').innerHTML= msg;
 }
 
-Date.prototype.getWeek = function() {
-    var onejan = new Date(this.getFullYear(), 0, 1);
-    return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 14);
+function printTable (table, name) {
+    var msg = '';
+    for (var i = 0; i < table.length; i++) {
+        msg += table[i] + '  ';
+    }
+    document.getElementById(name).innerHTML= "<tr><td>" + msg+"</td></tr>";
 }
 
-function shuffleArrayByWeekNum (currentWeekNum, numPeople) {
-    var startIndex = (Math.ceil(currentWeekNum/2) - 1 ) % numPeople;
-    var newStartArray = names.slice(startIndex);
-    var restArray = names.slice(0,startIndex);
-    names = newStartArray.concat(restArray);
-    return names;
+function printTables () {
+    for (var i = 0; i < 4; i++){
+        printTable(tables[i], 'table0' + [i+1]);
+    }
 }
 
 function removePeople(removePerson){
@@ -240,8 +255,158 @@ function longestNeibors (vertex, graph){
     return pos;
 }
 
+// function major (graph) {
+//     var finalResult = [];
+//     var i, j;
+
+//     firstTable = new Array();
+//     secondTable = new Array();
+//     var half = Math.floor(names.length/2);
+//     names = shuffleArrayByWeekNum(currentWeekNum, names.length);
+
+//     for (i = 0; i < half; i++) {
+//         firstTable.push(names[i]);
+//         for (j = i + 1; j < half; j++) {
+//             var firstNeighbourIndex = graph[i].neighbors.indexOf(graph[j].name);
+//             if(firstNeighbourIndex > -1) {
+//                 graph[i].neighbors.splice(firstNeighbourIndex, 1);
+//             }
+//             var secondNeighbourIndex = graph[j].neighbors.indexOf(graph[i].name);
+//             if(secondNeighbourIndex > -1 ) {
+//                 graph[j].neighbors.splice(secondNeighbourIndex, 1);
+//             }
+//         }
+//     }
+
+//     for (i = half; i < names.length; i++) {
+//         secondTable.push(names[i]);
+//         for (j = i + 1; j < names.length; j++) {
+//             var firstNeighbourIndex = graph[i].neighbors.indexOf(graph[j].name);
+//             if(firstNeighbourIndex > -1) {
+//                 graph[i].neighbors.splice(firstNeighbourIndex, 1);
+//             }
+//             var secondNeighbourIndex = graph[j].neighbors.indexOf(graph[i].name);
+//             if(secondNeighbourIndex > -1 ) {
+//                 graph[j].neighbors.splice(secondNeighbourIndex, 1);
+//             }
+//         }
+//     }
+
+
+//     while (edgesLeft(graph)){
+//         var rounds = [];
+//         for (var d = 0; d < graph.length; d++){
+//             var result = [];
+//             //the firstV is chosen from the 1st vertex with max # of undone edges in sorted graph
+//             var firstV = graph[d];
+//             if (firstV.neighbors.length == 0 || firstV.visited) {
+//                 continue;
+//             }
+//             //among the vertex's neighbors, return the neighbor vertex with longest neighbors
+//             //eg: for vertex 'Andrew' with neighbors ['Chatty','John','Mark']
+//             //each with neighbor.length of (3,7,4);
+//             //then returns 'John' as secondV in function major
+//             var secondIndex = longestNeibors(firstV,graph);
+//             if (secondIndex == -1) continue;
+//             var secondV = graph[secondIndex];
+
+//             var o1 = {key: firstV.name, value: secondV.name};
+//             var o2 = {key: secondV.name, value: firstV.name};
+//             result.push(o1);
+//             result.push(o2);
+//             rounds.push(result);
+
+//             //remove edges that have been paired. By removing people from the vertex's neighbor list
+//             var firstRemoveIndex = firstV.neighbors.indexOf(secondV.name);
+//             if(firstRemoveIndex > -1) {
+//                 firstV.neighbors.splice(firstRemoveIndex, 1);
+//                 firstV.visited = true;
+//             }
+//             var secondRemoveIndex = secondV.neighbors.indexOf(firstV.name);
+//             if(secondRemoveIndex > -1 ) {
+//                 secondV.neighbors.splice(secondRemoveIndex, 1);
+//                 secondV.visited = true;
+//             }
+//         }
+//         finalResult.push(rounds);
+//         graph.sort(function(a,b){
+//             return b.neighbors.length - a.neighbors.length ;
+//         });
+//         for (var k = 0; k < graph.length; k++) {
+//             graph[k].visited = false;
+//         }
+//     }
+//     return finalResult;
+// }
+
 function major (graph) {
     var finalResult = [];
+    var i, j;
+
+    firstTable = new Array();
+    secondTable = new Array();
+    thirdTable = new Array();
+    fourthTable = new Array();
+    var oneFourth = Math.floor(names.length/4);
+    var half = Math.floor(names.length/2);
+    var threeFourth = Math.floor(names.length/4*3);
+    // names = shuffleArrayByWeekNum(currentWeekNum, names.length);
+
+    for (i = 0; i < oneFourth; i++) {
+        firstTable.push(names[i]);
+        for (j = i + 1; j < oneFourth; j++) {
+            var firstNeighbourIndex = graph[i].neighbors.indexOf(graph[j].name);
+            if(firstNeighbourIndex > -1) {
+                graph[i].neighbors.splice(firstNeighbourIndex, 1);
+            }
+            var secondNeighbourIndex = graph[j].neighbors.indexOf(graph[i].name);
+            if(secondNeighbourIndex > -1 ) {
+                graph[j].neighbors.splice(secondNeighbourIndex, 1);
+            }
+        }
+    }
+    for (i = oneFourth; i < half; i++) {
+        secondTable.push(names[i]);
+        for (j = i + 1; j < half; j++) {
+            var firstNeighbourIndex = graph[i].neighbors.indexOf(graph[j].name);
+            if(firstNeighbourIndex > -1) {
+                graph[i].neighbors.splice(firstNeighbourIndex, 1);
+            }
+            var secondNeighbourIndex = graph[j].neighbors.indexOf(graph[i].name);
+            if(secondNeighbourIndex > -1 ) {
+                graph[j].neighbors.splice(secondNeighbourIndex, 1);
+            }
+        }
+    }
+    for (i = half; i < threeFourth; i++) {
+        thirdTable.push(names[i]);
+        for (j = i + 1; j < half; j++) {
+            var firstNeighbourIndex = graph[i].neighbors.indexOf(graph[j].name);
+            if(firstNeighbourIndex > -1) {
+                graph[i].neighbors.splice(firstNeighbourIndex, 1);
+            }
+            var secondNeighbourIndex = graph[j].neighbors.indexOf(graph[i].name);
+            if(secondNeighbourIndex > -1 ) {
+                graph[j].neighbors.splice(secondNeighbourIndex, 1);
+            }
+        }
+    }
+
+    for (i = threeFourth; i < names.length; i++) {
+        fourthTable.push(names[i]);
+        for (j = i + 1; j < names.length; j++) {
+            var firstNeighbourIndex = graph[i].neighbors.indexOf(graph[j].name);
+            if(firstNeighbourIndex > -1) {
+                graph[i].neighbors.splice(firstNeighbourIndex, 1);
+            }
+            var secondNeighbourIndex = graph[j].neighbors.indexOf(graph[i].name);
+            if(secondNeighbourIndex > -1 ) {
+                graph[j].neighbors.splice(secondNeighbourIndex, 1);
+            }
+        }
+    }
+
+
     while (edgesLeft(graph)){
         var rounds = [];
         for (var d = 0; d < graph.length; d++){
@@ -287,3 +452,13 @@ function major (graph) {
     }
     return finalResult;
 }
+
+
+function reset (){
+    table1 = [];
+    table2 = [];
+    table3 = [];
+    table4 = [];
+    tables = [];
+}
+
