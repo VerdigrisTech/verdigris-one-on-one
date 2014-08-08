@@ -20,7 +20,7 @@ function dispatchToTables () {
             table4.push(names[i]);
         }
     }
-    console.log('tables');
+    console.log('tables: ');
     console.log([table1, table2, table3, table4]);
     return tables = [table1, table2, table3, table4];
 }
@@ -81,7 +81,6 @@ function lunchPairings(tables){
     for (var i = 0; i < tables.length; i++){
         result.push(lunchPairing(tables[i]));
     }
-    var a = flatLunchTableRows(result);
     return result;
 }
 
@@ -91,7 +90,6 @@ function flatToRow (complexArray, index){
     for (var j = 0; j < 4; j++){
         result.push(complexArray[j][index]);
     }
-    console.log (result);
     for (var i = 0; i < 4; i++){
         for(var k = 0; k < result[i].length; k++){
             row.push(result[i][k]);
@@ -105,12 +103,35 @@ function flatLunchTableRows (complexArray){
     for (var i = 0; i < 3; i++){
         lunchRows.push(flatToRow(complexArray, i));
     }
+    console.log('lunchRows');
     console.log(lunchRows);
     return lunchRows;
 }
-function doubleTable (table1, table2){
-    var result = [];
 
+
+function twoTableTalk (table1, table2){
+    var row1 = [table2[0], table2[1], table2[2], table2[3],
+                table1[0], table1[1], table1[2], table1[3]
+                ];
+    var row2 = [table2[1], table2[2], table2[3], table2[0],
+                table1[3], table1[0], table1[1], table1[2]];
+    var row3 = [table2[2], table2[3], table2[0], table2[1],
+                table1[2], table1[3], table1[0], table1[1]];
+    var row4 = [table2[3], table2[0], table2[1], table2[2],
+                table1[1], table1[2], table1[3], table1[0]];
+    return [row1, row2, row3, row4];
+}
+
+//rows for normal one on ones in a week
+function normalRows (tables){
+    var T1 = twoTableTalk(tables[0], tables[1]);
+    var T2 = twoTableTalk(tables[2], tables[3]);
+    var result =[];
+    for (var i = 0; i < 4; i++){
+        result.push(T1[i].concat(T2[i]));
+    }
+    console.log(result);
+    return result;
 }
 
 function insertTable()
@@ -139,54 +160,52 @@ function insertTable()
     // names = shuffleArrayByWeekNum(currentWeekNum, names.length);
     dispatchToTables();
 
-    var finalResult = major(graph);
+    // var finalResult = major(graph);
 
     theader += printHeadingRow (theader, tables);
     lunchPairings(tables);
+
+    var a = flatLunchTableRows(lunchPairings(tables)); //array of 3 rows for lunch table
+    var b = normalRows(tables); //array of 4 rows for lunch table
     //Per row:
     var minIndex = 0;
-    for(var i = 0; i < finalResult.length; i++)
-    {
-        if (i% weekThrehold == 0 ){
-            hour = startHr -1;
-            var spanNum = numPeople + 1;
-            var endDate = new Date();
-            endDate.setDate(startDate.getDate() + 7);
-            tbody += "<tr>" + "<td class='highlight' colspan = \"" + spanNum + "\">";
-            tbody += ' Week ' + weekNum + ' : ';
-            tbody += "From " + startDate.toString().substring(0,15) + " To " + endDate.toString().substring(0,15);
-            tbody += "</td>" + "</tr>";
-            weekNum ++ ;
-            startDate = endDate;
-            minIndex = 0;
-        }
+    hour = startHr -1;
+    var spanNum = numPeople + 1;
+    tbody += "<tr>" + "<td class='highlight' colspan = \"" + spanNum + "\">";
+    tbody += ' Week ' + weekNum + ' : ';
+    tbody += "</td>" + "</tr>";
+    weekNum ++ ;
+    minIndex = 0;
 
 
-        //first column: setting time
-        min = minA[minIndex%(60/timeInterval)];
-        minIndex ++;
-        if ((minIndex-1)%(60/timeInterval) == 0) {
-            hour++;
-        }
+    //first column: setting time
+    min = minA[minIndex%(60/timeInterval)];
+    minIndex ++;
+    if ((minIndex-1)%(60/timeInterval) == 0) {
+        hour++;
+    }
+
+    //filling one row of cells with data
+    for (var k = 0; k < b.length; k++){
         tbody += "<tr>" + "<td>";
         tbody += hour + ': ' + min;
         tbody += "</td>"
-
-        //filling cells with data
-        for(var j = 1; j <= numPeople; j++)
-        {
-            tbody += "<td>";
-            var round = finalResult[i];
-            for (var g = 0; g < round.length; g++){
-                var meeting = round[g];
-                if (names[j-1] == meeting[0].key){
-                    tbody += meeting[0].value;
-                } else if (names[j-1] == meeting[1].key) {
-                    tbody += meeting[1].value;
-                }
+            for (var g = 0; g < b[k].length; g++){
+                tbody += "<td>";
+                tbody += b[k][g];
+                tbody += "</td>";
             }
-            tbody += "</td>"
-        }
+        tbody += "</tr>";
+    }
+    for (var k = 0; k < a.length; k++){
+        tbody += "<tr>" + "<td>";
+        tbody += hour + ': ' + min;
+        tbody += "</td>"
+            for (var g = 0; g < a[k].length; g++){
+                tbody += "<td>";
+                tbody += a[k][g];
+                tbody += "</td>";
+            }
         tbody += "</tr>";
     }
 
