@@ -1,6 +1,6 @@
 var names = ['Andrew', 'Chatty', 'David', 'Dawn', 'Jacques',
     'Jan', 'John', 'Jon', 'Luke', 'Mark',
-    'Martin', 'Patrick', 'Sue', 'Thomas', 'Will', 'N/A'];
+    'Martin', 'Patrick', 'Sue', 'Thomas', 'Will', ' '];
 var tableNo = Math.ceil(names.length/4);
 var table1 = [];
 var table2 = [];
@@ -32,8 +32,8 @@ Date.prototype.getWeek = function() {
 //currentWeekNum increment every 2 weeks so that schedule does not change
 var currentWeekNum = Math.floor(new Date().getWeek()/2);
 
-function shuffleArrayByWeekNum (currentWeekNum, numPeople) {
-    var startIndex = (Math.ceil(currentWeekNum/2) - 1 ) % numPeople;
+function shuffleArrayByWeekNum (currentWeekNum) {
+    var startIndex = (Math.ceil(currentWeekNum/2) - 1 ) % names.length;
     var newStartArray = names.slice(startIndex);
     var restArray = names.slice(0,startIndex);
     names = newStartArray.concat(restArray);
@@ -143,8 +143,7 @@ function insertTable()
     var removePerson = document.getElementById('removeP').value;
     removePeople(removePerson);
 
-    var numPeople = names.length;
-    var weekThrehold = Math.ceil((numPeople+1)/4);
+    var weekThrehold = Math.ceil((names.length+1)/4);
 
     var startHr = document.getElementById('startHour').value;
     var hour = Number(startHr)
@@ -156,8 +155,8 @@ function insertTable()
     var weekNum = 1;
     var theader = "<table id='table1'>";
     var tbody = "";
-    var graph = buildGraph(numPeople);
-    // names = shuffleArrayByWeekNum(currentWeekNum, names.length);
+    var graph = buildGraph();
+    // names = shuffleArrayByWeekNum(currentWeekNum);
     dispatchToTables();
 
 
@@ -169,7 +168,7 @@ function insertTable()
     //Per row:
     var minIndex = 0;
     hour = startHr -1;
-    var spanNum = numPeople + 1;
+    var spanNum = names.length + 1;
     tbody += "<tr>" + "<td class='highlight' colspan = \"" + spanNum + "\">";
     tbody += ' Week ' + weekNum + ' : ';
     tbody += "</td>" + "</tr>";
@@ -255,22 +254,22 @@ function cleanFields(){
     document.getElementById('removeP').value='';
 }
 
-function buildGraph (numPeople){
+function buildGraph (){
     var vertices =[];
-    for (var i = 0; i < numPeople; i++){
-        var vertex = buildVertex(names[i],i,numPeople);
+    for (var i = 0; i < names.length; i++){
+        var vertex = buildVertex(names[i],i);
         vertices.push(vertex);
     }
     return vertices;
 }
 
-function buildVertex (name, index, numPeople){
+function buildVertex (name, index){
     var vertex = {};
     vertex.id = index;
     vertex.name = name;
     vertex.visited = false;
     var neighbors = [];
-    for (var i = 0; i < numPeople; i++){
+    for (var i = 0; i < names.length; i++){
         if (i == index) {
         } else {
             neighbors.push(names[i]);
