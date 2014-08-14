@@ -1,29 +1,43 @@
 var names = ['Andrew', 'Chatty', 'David', 'Dawn', 'Jacques',
     'Jan', 'John', 'Jon', 'Luke', 'Mark',
-    'Martin', 'Patrick', 'Sue', 'Thomas', 'Will', ' '];
+    'Martin', 'Sue', 'Thomas', 'Will'];
 var tableNo = Math.ceil(names.length/4);
-var table1 = [];
-var table2 = [];
-var table3 = [];
-var table4 = [];
-var tables = [];
+var w1t1 = [];
+var w1t2 = [];
+var w1t3 = [];
+var w1t4 = [];
+var w2t1 = [];
+var w2t2 = [];
+var w2t3 = [];
+var w2t4 = [];
+var w1Tables = [];
+var w2Tables = [];
 
-function dispatchToTables () {
+function w1Dispatch (){
     for (var i = 0; i < names.length; i++){
         if(i % tableNo == 0){
-            table1.push(names[i]);
+            w1t1.push(names[i]);
         } else if(i % tableNo == 1){
-            table2.push(names[i]);
+            w1t2.push(names[i]);
         } else if(i % tableNo == 2){
-            table3.push(names[i]);
-        } else{
-            table4.push(names[i]);
+            w1t3.push(names[i]);
+        } else if(i % tableNo == 3){
+            w1t4.push(names[i]);
         }
     }
-    console.log('tables: ');
-    console.log([table1, table2, table3, table4]);
-    return tables = [table1, table2, table3, table4];
+    console.log([w1t1, w1t2, w1t3, w1t4]);
+    return w1Tables = [w1t1, w1t2, w1t3, w1t4];
 }
+
+function week2DispatchToTables (tables){
+    return newNames = [
+        tables[0][0], tables[0][2], tables[1][1], tables[3][1],
+        tables[1][0], tables[1][2], tables[0][1], tables[2][1],
+        tables[2][0], tables[2][2], tables[1][3], tables[3][3],
+        tables[3][0], tables[3][2], tables[0][3], tables[2][3]
+    ];
+}
+
 //Get week based on current date
 Date.prototype.getWeek = function() {
     var onejan = new Date(this.getFullYear(), 0, 1);
@@ -59,28 +73,26 @@ function printHeadingRow (theader, table) {
     return theader;
 }
 
-function minSlots (interval) {
-    var len = 60/interval;
-    var result = [];
-    result[0] = '00';
-    for (var i = 1; i <= len; i++) {
-        result[i] = 60/len*i
-    }
-    return result;
-}
-
-function lunchPairing(table){
+function lunchPairing4(table){
     var row1 = [table[1], table[0], table[3], table[2]];
     var row2 = [table[2], table[3], table[0], table[1]];
     var row3 = [table[3], table[2], table[1], table[0]];
     return [row1, row2, row3];
 }
 
+function lunchPairing3(table){
+    var row1 = [table[1], table[0], " "];
+    var row2 = [table[2], " ", table[0]];
+    var row3 = [" ", table[2], table[1]];
+    return [row1, row2, row3];
+}
+
 function lunchPairings(tables){
     var result = [];
-    for (var i = 0; i < tables.length; i++){
-        result.push(lunchPairing(tables[i]));
-    }
+    result.push(lunchPairing4(tables[0]));
+    result.push(lunchPairing4(tables[1]));
+    result.push(lunchPairing3(tables[2]));
+    result.push(lunchPairing3(tables[3]));
     return result;
 }
 
@@ -103,13 +115,11 @@ function flatLunchTableRows (complexArray){
     for (var i = 0; i < 3; i++){
         lunchRows.push(flatToRow(complexArray, i));
     }
-    console.log('lunchRows');
-    console.log(lunchRows);
     return lunchRows;
 }
 
 
-function twoTableTalk (table1, table2){
+function twoTableTalk4 (table1, table2){
     var row1 = [table2[0], table2[1], table2[2], table2[3],
                 table1[0], table1[1], table1[2], table1[3]
                 ];
@@ -122,93 +132,83 @@ function twoTableTalk (table1, table2){
     return [row1, row2, row3, row4];
 }
 
+function twoTableTalk3 (table1, table2){
+    var row1 = [" ", " ", " ", " ", " ", " ", " ", " "];
+    var row2 = [table2[0], table2[1], table2[2],
+                table1[0], table1[1], table1[2]];
+    var row3 = [table2[1], table2[2], table2[0],
+                table1[2], table1[0], table1[1]];
+    var row4 = [table2[2], table2[0], table2[1],
+                table1[1], table1[2], table1[0]];
+    return [row1, row2, row3, row4];
+}
+
 //rows for normal one on ones in a week
 function normalRows (tables){
-    var T1 = twoTableTalk(tables[0], tables[1]);
-    var T2 = twoTableTalk(tables[2], tables[3]);
+    var T1 = twoTableTalk4(tables[0], tables[1]);
+    var T2 = twoTableTalk3(tables[2], tables[3]);
     var result =[];
     for (var i = 0; i < 4; i++){
         result.push(T1[i].concat(T2[i]));
     }
-    console.log(result);
     return result;
 }
 
 function insertTable()
 {
-    //add/remove people
+    //add remove people
     reset();
     var addPerson = document.getElementById('addP').value;
     if(addPerson) {names.push(addPerson);}
     var removePerson = document.getElementById('removeP').value;
     removePeople(removePerson);
 
-    var weekThrehold = Math.ceil((names.length+1)/4);
-
     var startHr = document.getElementById('startHour').value;
     var hour = Number(startHr)
     var timeInterval = document.getElementById('timeInterval').value;
     var startDate = getStartDayOfWeek(currentWeekNum);
 
-    var minA = minSlots(timeInterval)
-
-    var weekNum = 1;
     var theader = "<table id='table1'>";
     var tbody = "";
-    var graph = buildGraph();
     // names = shuffleArrayByWeekNum(currentWeekNum);
-    dispatchToTables();
+    w1Dispatch();
 
-
-    theader += printHeadingRow (theader, tables);
-    lunchPairings(tables);
-
-    var a = flatLunchTableRows(lunchPairings(tables)); //array of 3 rows for lunch table
-    var b = normalRows(tables); //array of 4 rows for lunch table
-    //Per row:
-    var minIndex = 0;
-    hour = startHr -1;
-    var spanNum = names.length + 1;
-    tbody += "<tr>" + "<td class='highlight' colspan = \"" + spanNum + "\">";
-    tbody += ' Week ' + weekNum + ' : ';
-    tbody += "</td>" + "</tr>";
-    weekNum ++ ;
-    minIndex = 0;
-
-
-    //first column: setting time
-    min = minA[minIndex%(60/timeInterval)];
-    minIndex ++;
-    if ((minIndex-1)%(60/timeInterval) == 0) {
-        hour++;
-    }
-
+    theader += printHeadingRow (theader, w1Tables);
+    var a = lunchPairings(w1Tables);
+    var firstWeekLunchRows = flatLunchTableRows(lunchPairings(w1Tables));
+    //array of 3 rows for lunch table
+    var firstWeekNormalRows = normalRows(w1Tables);
+    //array of 4 rows for lunch table
+    var time = ["11:00", "11:20","11:40","12:00","12:40","13:00","13:20"];
+    var timeIndex = 0;
     //filling one row of cells with data
-    for (var k = 0; k < b.length; k++){
+    for (var k = 0; k < firstWeekNormalRows.length; k++){
         tbody += "<tr>" + "<td>";
-        tbody += hour + ': ' + min;
+        tbody += time[timeIndex];
         tbody += "</td>"
-            for (var g = 0; g < b[k].length; g++){
+            for (var g = 0; g < firstWeekNormalRows[k].length; g++){
                 tbody += "<td>";
-                tbody += b[k][g];
+                tbody += firstWeekNormalRows[k][g];
                 tbody += "</td>";
             }
         tbody += "</tr>";
+        timeIndex++;
     }
-    for (var k = 0; k < a.length; k++){
+    for (var k = 0; k < firstWeekLunchRows.length; k++){
         tbody += "<tr>" + "<td>";
-        tbody += hour + ': ' + min;
+        tbody += time[timeIndex];
         tbody += "</td>"
-            for (var g = 0; g < a[k].length; g++){
+            for (var g = 0; g < firstWeekLunchRows[k].length; g++){
                 tbody += "<td>";
-                tbody += a[k][g];
+                tbody += firstWeekLunchRows[k][g];
                 tbody += "</td>";
             }
         tbody += "</tr>";
+        timeIndex++;
     }
 
     var tfooter = "</table>";
-    document.getElementById('schedule').innerHTML = theader + tbody + tfooter;
+    document.getElementById('schedule1').innerHTML = theader + tbody + tfooter;
     currentPeople();
     printTables();
     cleanFields();
@@ -233,7 +233,7 @@ function printTable (table, name) {
 
 function printTables () {
     for (var i = 0; i < 4; i++){
-        printTable(tables[i], 'table0' + [i+1]);
+        printTable(w1Tables[i], 'table0' + [i+1]);
     }
 }
 
@@ -254,76 +254,15 @@ function cleanFields(){
     document.getElementById('removeP').value='';
 }
 
-function buildGraph (){
-    var vertices =[];
-    for (var i = 0; i < names.length; i++){
-        var vertex = buildVertex(names[i],i);
-        vertices.push(vertex);
-    }
-    return vertices;
-}
-
-function buildVertex (name, index){
-    var vertex = {};
-    vertex.id = index;
-    vertex.name = name;
-    vertex.visited = false;
-    var neighbors = [];
-    for (var i = 0; i < names.length; i++){
-        if (i == index) {
-        } else {
-            neighbors.push(names[i]);
-        }
-    }
-    vertex.neighbors = neighbors;
-    return vertex;
-}
-
-//returns true if there's edge left in graph, that is,
-//any vertex's neighbors still have a member in it.
-//as condition check in major: while()
-function edgesLeft(graph){
-    for (var c = 0; c < graph.length; c++){
-        if (graph[c].neighbors.length > 0){
-            return true;
-        }
-    }
-    return false;
-}
-
-//get vertex from its name in the graph, helper fn of longestNeibors
-function vertexByName (graph, name){
-    for (var i = 0; i < graph.length; i++){
-        if (name == graph[i].name){
-            return graph[i];
-        }
-    }
-}
-
-function longestNeibors (vertex, graph){
-    var edges = vertex.neighbors;
-    var max = 0;
-    //-1 means not found, so paired up already
-    var maxIndex = -1;
-    var pos = -1;
-    for (var h = 0; h < edges.length; h++){
-        var v = vertexByName(graph, edges[h]);
-        if (Number(v.neighbors.length) > max && !v.visited) {
-            max = Number(v.neighbors.length);
-            maxIndex = h;
-        }
-    }
-    if (maxIndex != -1) {
-        pos = graph.map(function(n) {return n.name;}).indexOf(edges[maxIndex]);
-    }
-    return pos;
-}
-
 function reset (){
-    table1 = [];
-    table2 = [];
-    table3 = [];
-    table4 = [];
-    tables = [];
+    w1t1 = [];
+    w1t2 = [];
+    w1t3 = [];
+    w1t4 = [];
+    w2t1 = [];
+    w2t2 = [];
+    w2t3 = [];
+    w2t4 = [];
+    w1Tables = [];
+    w2Tables = [];
 }
-
