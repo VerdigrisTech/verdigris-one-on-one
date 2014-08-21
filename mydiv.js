@@ -1,19 +1,17 @@
 var names = ['Andrew', 'Chatty', 'David', 'Dawn', 'Jacques',
-    'Jan', 'John', 'Jon', 'Luke', 'Mark',
-    'Martin', 'Sue', 'Thomas', 'Will'];
+              'Jan', 'John', 'Jon', 'Luke', 'Mark',
+              'Martin', 'Sue', 'Thomas', 'Will'];
+var time = ["10:20", "10:40", "11:00", "11:20","11:40",
+            "12:00","12:20", "12:40","13:00","13:20", "13:40",
+            "14:00","14:20", "14:40","15:00","15:20", "15:40"];
 var tableNo = Math.ceil(names.length/4);
 var w1t1 = [];
 var w1t2 = [];
 var w1t3 = [];
 var w1t4 = [];
-var w2t1 = [];
-var w2t2 = [];
-var w2t3 = [];
-var w2t4 = [];
 var w1Tables = [];
-var w2Tables = [];
 
-function w1Dispatch (){
+function w1Dispatch (names){
     for (var i = 0; i < names.length; i++){
         if(i % tableNo == 0){
             w1t1.push(names[i]);
@@ -25,20 +23,9 @@ function w1Dispatch (){
             w1t4.push(names[i]);
         }
     }
-    console.log([w1t1, w1t2, w1t3, w1t4]);
     return w1Tables = [w1t1, w1t2, w1t3, w1t4];
 }
 
-function week2DispatchToTables (tables){
-    return newNames = [
-        tables[0][0], tables[0][2], tables[1][1], tables[3][1],
-        tables[1][0], tables[1][2], tables[0][1], tables[2][1],
-        tables[2][0], tables[2][2], tables[1][3], tables[3][3],
-        tables[3][0], tables[3][2], tables[0][3], tables[2][3]
-    ];
-}
-
-//Get week based on current date
 Date.prototype.getWeek = function() {
     var onejan = new Date(this.getFullYear(), 0, 1);
     return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 7);
@@ -47,10 +34,16 @@ Date.prototype.getWeek = function() {
 var currentWeekNum = Math.floor(new Date().getWeek()/2);
 
 function shuffleArrayByWeekNum (currentWeekNum) {
+    console.log(names);
     var startIndex = (Math.ceil(currentWeekNum/2) - 1 ) % names.length;
     var newStartArray = names.slice(startIndex);
     var restArray = names.slice(0,startIndex);
     names = newStartArray.concat(restArray);
+    names = [
+      names[4], names[5], names[6], names[3], names[8], names[9], names[10],
+      names[7], names[0], names[1], names[2], names[12], names[13], names[11]
+    ];
+    console.log(names);
     return names;
 }
 
@@ -62,7 +55,6 @@ function getStartDayOfWeek(weekNo){
 };
 
 function printHeadingRow (theader, table) {
-    //Output names for table heading, ie, people's names
     theader += "<th> " +" </th>";
     for(var i = 0; i < table.length; i++)
     {
@@ -71,29 +63,6 @@ function printHeadingRow (theader, table) {
         }
     }
     return theader;
-}
-
-function lunchPairing4(table){
-    var row1 = [table[1], table[0], table[3], table[2]];
-    var row2 = [table[2], table[3], table[0], table[1]];
-    var row3 = [table[3], table[2], table[1], table[0]];
-    return [row1, row2, row3];
-}
-
-function lunchPairing3(table){
-    var row1 = [table[1], table[0], " "];
-    var row2 = [table[2], " ", table[0]];
-    var row3 = [" ", table[2], table[1]];
-    return [row1, row2, row3];
-}
-
-function lunchPairings(tables){
-    var result = [];
-    result.push(lunchPairing4(tables[0]));
-    result.push(lunchPairing4(tables[1]));
-    result.push(lunchPairing3(tables[2]));
-    result.push(lunchPairing3(tables[3]));
-    return result;
 }
 
 function flatToRow (complexArray, index){
@@ -109,15 +78,6 @@ function flatToRow (complexArray, index){
     }
     return row;
 }
-
-function flatLunchTableRows (complexArray){
-    var lunchRows = [];
-    for (var i = 0; i < 3; i++){
-        lunchRows.push(flatToRow(complexArray, i));
-    }
-    return lunchRows;
-}
-
 
 function twoTableTalk4 (table1, table2){
     var row1 = [table2[0], table2[1], table2[2], table2[3],
@@ -143,7 +103,6 @@ function twoTableTalk3 (table1, table2){
     return [row1, row2, row3, row4];
 }
 
-//rows for normal one on ones in a week
 function normalRows (tables){
     var T1 = twoTableTalk4(tables[0], tables[1]);
     var T2 = twoTableTalk3(tables[2], tables[3]);
@@ -163,24 +122,15 @@ function insertTable()
     var removePerson = document.getElementById('removeP').value;
     removePeople(removePerson);
 
-    var startHr = document.getElementById('startHour').value;
-    var hour = Number(startHr)
-    var timeInterval = document.getElementById('timeInterval').value;
+    var timeIndex = document.getElementById('startTime').value;
     var startDate = getStartDayOfWeek(currentWeekNum);
 
     var theader = "<table id='table1'>";
     var tbody = "";
-    // names = shuffleArrayByWeekNum(currentWeekNum);
-    w1Dispatch();
-
+    names = shuffleArrayByWeekNum(currentWeekNum-1);
+    w1Dispatch(names);
     theader += printHeadingRow (theader, w1Tables);
-    var a = lunchPairings(w1Tables);
-    var firstWeekLunchRows = flatLunchTableRows(lunchPairings(w1Tables));
-    //array of 3 rows for lunch table
     var firstWeekNormalRows = normalRows(w1Tables);
-    //array of 4 rows for lunch table
-    var time = ["11:00", "11:20","11:40","12:00","12:40","13:00","13:20"];
-    var timeIndex = 0;
     //filling one row of cells with data
     for (var k = 0; k < firstWeekNormalRows.length; k++){
         tbody += "<tr>" + "<td>";
@@ -194,18 +144,7 @@ function insertTable()
         tbody += "</tr>";
         timeIndex++;
     }
-    for (var k = 0; k < firstWeekLunchRows.length; k++){
-        tbody += "<tr>" + "<td>";
-        tbody += time[timeIndex];
-        tbody += "</td>"
-            for (var g = 0; g < firstWeekLunchRows[k].length; g++){
-                tbody += "<td>";
-                tbody += firstWeekLunchRows[k][g];
-                tbody += "</td>";
-            }
-        tbody += "</tr>";
-        timeIndex++;
-    }
+
 
     var tfooter = "</table>";
     document.getElementById('schedule1').innerHTML = theader + tbody + tfooter;
@@ -214,7 +153,6 @@ function insertTable()
     cleanFields();
 }
 
-//Print current people in array so can have reference to input format of string for removing people
 function currentPeople () {
     var msg = 'Current peers: ';
     for (var i = 0; i < names.length; i++){

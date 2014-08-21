@@ -25,20 +25,23 @@
             <p>
                 <label>
                     Start @
-                    <select id='startHour'>
-                      <option value="12">12</option>
-                      <option value="11" selected='selected'>11</option>
+                    <select id='startTime'>
+                      <option value="0">10:20</option>
+                      <option value="1">10:40</option>
+                      <option value="2" selected='selected'>11:00</option>
+                      <option value="3">11:20</option>
+                      <option value="4">11:40</option>
+                      <option value="5">12:00</option>
+                      <option value="6">12:20</option>
+                      <option value="7">12:40</option>
+                      <option value="8">1:00</option>
+                      <option value="9">1:20</option>
+                      <option value="10">1:40</option>
+                      <option value="11">2:00</option>
+                      <option value="12">2:20</option>
+                      <option value="13">2:40</option>
+                      <option value="14">3:00</option>
                     </select>
-                     am
-                </label>
-
-                <label>
-                    every
-                    <select id='timeInterval'>
-                        <option value="20" selected='selected'>20</option>
-                      <option value="30">30</option>
-                    </select>
-                            minutes
                 </label>
 
                 <button  type="button" onclick="insertTable()">
