@@ -1,6 +1,9 @@
 var names = ['Andrew', 'Chatty', 'David', 'Dawn', 'Jacques',
               'Jan', 'John', 'Jon', 'Luke', 'Mark',
               'Martin', 'Sue', 'Thomas', 'Will'];
+var time = ["10:20", "10:40", "11:00", "11:20","11:40",
+            "12:00","12:20", "12:40","13:00","13:20", "13:40",
+            "14:00","14:20", "14:40","15:00","15:20", "15:40"];
 //tables2 = divideTablesWeek2(graph3, graph4);
 var tables2 = [['Andrew', 'David', 'Luke', 'Martin'],
                ['Chatty',' Dawn', 'John', 'Sue'],
@@ -62,10 +65,6 @@ function insertTable()
     var weekThrehold = 4;
 
     var startHr = document.getElementById('startHour').value;
-    var hour = Number(startHr)
-    var timeInterval = document.getElementById('timeInterval').value;
-
-    var minA = minSlots(timeInterval)
 
     var weekNum = 1;
     var currentWeekNum = (new Date()).getWeek();
@@ -101,10 +100,6 @@ function insertTable()
     var part3 = new Array();
     var part4 = new Array();
     partition(tables, part3, part4);
-    console.log(part1);
-    console.log(part2);
-    console.log(part3);
-    console.log(part4);
     var graph3 = buildGraph(part3);
     var graph4 = buildGraph(part4);
     removeSameTablePairs(tables, graph3, graph4);
@@ -124,10 +119,10 @@ function insertTable()
 
     //Per row:
     var minIndex = 0;
+    var timeIndex = startHr;
     for(var i = 0; i < finalResult1.length; i++)
     {
         if (i% (weekThrehold) == 0){
-            hour = startHr -1;
             var spanNum = numPeople + 1;
             var endDate = new Date();
             endDate.setDate(startDate.getDate() + 7);
@@ -137,20 +132,15 @@ function insertTable()
             tbody += "</td>" + "</tr>";
             weekNum ++ ;
             startDate = endDate;
-            minIndex = 0;
+            timeIndex = startHr;
         }
 
 
         //first column: setting time
-        min = minA[minIndex%(60/timeInterval)];
-        minIndex ++;
-        if ((minIndex-1)%(60/timeInterval) == 0) {
-            hour++;
-        }
         tbody += "<tr>" + "<td>";
-        tbody += hour + ': ' + min;
+        tbody += time[timeIndex];
         tbody += "</td>"
-
+        timeIndex++;
         //filling cells with data
         for(var j = 1; j <= numPeople; j++)
         {
@@ -438,6 +428,8 @@ function rearrangeTables(tables) {
 // }
 
 function major (graph, roundsLimit) {
+    var currentWeekNum = (new Date()).getWeek();
+    names = shuffleArrayByWeekNum(currentWeekNum, names.length);
     var finalResult = [];
 
     while (edgesLeft(graph) && roundsLimit != 0){
