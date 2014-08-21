@@ -25,23 +25,32 @@
             <p>
                 <label>
                     Start @
-                    <select id='startTime'>
-                      <option value="0">10:20</option>
-                      <option value="1">10:40</option>
-                      <option value="2" selected='selected'>11:00</option>
-                      <option value="3">11:20</option>
-                      <option value="4">11:40</option>
-                      <option value="5">12:00</option>
-                      <option value="6">12:20</option>
-                      <option value="7">12:40</option>
-                      <option value="8">1:00</option>
-                      <option value="9">1:20</option>
-                      <option value="10">1:40</option>
-                      <option value="11">2:00</option>
-                      <option value="12">2:20</option>
-                      <option value="13">2:40</option>
-                      <option value="14">3:00</option>
+                    <select id='startHour'>
+                      <option value="11" selected='selected'>11</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
                     </select>
+                     pm
+                </label>
+
+                <label>
+                    every
+                    <select id='timeInterval'>
+                        <option value="20" selected='selected'>20</option>
+                    </select>
+                            minutes
+                </label>
+
+                <label>
+                    for
+                    <select id='weekNum'>
+                      <option value="1">1</option>
+                      <option value="2" selected='selected'>2</option>
+                      <option value="3">3</option>
+                    </select>
+                     week(s)
                 </label>
 
                 <button  type="button" onclick="insertTable()">
@@ -53,6 +62,8 @@
         <div style="clear:both;"></div>
         <div>
             <table class='outset'>
+                <th class='highlight'>Week:
+                </th>
                 <th class='highlight'>Lunch Table A Members:
                 </th>
                 <th class='highlight'>Lunch Table B Members:
@@ -62,6 +73,8 @@
                 <th class='highlight'>Lunch Table D Members:
                 </th>
                 <tbody>
+                  <tr>
+                    <td>Week 1</td>
                     <td>
                     <div id='table2'>
                         <label id='table01'>
@@ -86,61 +99,42 @@
                         </label>
                     </div>
                     </td>
+                  </tr>
+                  <tr>
+                    <td>Week 2</td>
+                    <td>
+                    <div id='table6'>
+                        <label id='table05'>
+                        </label>
+                    </div>
+                    </td>
+                    <td>
+                    <div id='table7'>
+                        <label id='table06'>
+                        </label>
+                    </div>
+                    </td>
+                    <td>
+                    <div id='table8'>
+                        <label id='table07'>
+                        </label>
+                    </div>
+                    </td>
+                    <td>
+                    <div id='table9'>
+                        <label id='table08'>
+                        </label>
+                    </div>
+                    </td>
+                  </tr>
                 </tbody>
             </table>
         </div>
         <br>
-        <div id='table1'>
-            <table class="outset" name="tableForm" id='table1'>
-                <div id="schedule1"></div>
-            </table>
-        </div>
 
-
-    <div style="clear:both;"></div>
-    <br>
-        <!-- <div>
-            <table class='outset'>
-                <th class='highlight'>Lunch Table A Members:
-                </th>
-                <th class='highlight'>Lunch Table B Members:
-                </th>
-                <th class='highlight'>Lunch Table C Members:
-                </th>
-                <th class='highlight'>Lunch Table D Members:
-                </th>
-                <tbody>
-                    <td>
-                    <div id='tableW22'>
-                        <label id='table11'>
-                        </label>
-                    </div>
-                    </td>
-                    <td>
-                    <div id='tableW23'>
-                        <label id='table12'>
-                        </label>
-                    </div>
-                    </td>
-                    <td>
-                    <div id='tableW24'>
-                        <label id='table13'>
-                        </label>
-                    </div>
-                    </td>
-                    <td>
-                    <div id='tableW25'>
-                        <label id='table14'>
-                        </label>
-                    </div>
-                    </td>
-                </tbody>
-            </table>
-        </div> -->
-        <br>
-        <div>
-            <table class="outset" name="tableForm" id='table11'>
-                <div id="schedule2"></div>
+        <div id='table'>
+            <table name="tableForm" id='table1'>
+                <div id="schedule"></div>
             </table>
         </div>
 
@@ -156,7 +150,13 @@
                 </label>
 
                 </p><br>
+                <label id='test'>
 
+                </label>
+                <label id='table1'>
+                </label>
+                <label id='table2'>
+                </label>
             </p>
         </div>
 
