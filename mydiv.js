@@ -1,4 +1,4 @@
-var names = ['Andrew', 'Chatty', 'David', 'Dawn', 'Jacques',
+var names = ['Andrew', 'Chatty', 'David', 'Jacques',
               'Jan', 'John', 'Jon', 'Luke', 'Mark',
               'Martin', 'Sue', 'Thomas', 'Will'];
 var time = ["10:20", "10:40", "11:00", "11:20","11:40",
@@ -6,7 +6,7 @@ var time = ["10:20", "10:40", "11:00", "11:20","11:40",
             "14:00","14:20", "14:40","15:00","15:20", "15:40"];
 //tables2 = divideTablesWeek2(graph3, graph4);
 var tables2 = [['Andrew', 'David', 'Luke', 'Martin'],
-               ['Chatty',' Dawn', 'John', 'Sue'],
+               ['Chatty', 'John', 'Sue'],
                ['Jacques', 'Mark', 'Thomas'],
                ['Jan', 'Jon', 'Will']];
 var numPeoplePerTable = 4;
@@ -112,7 +112,7 @@ function insertTable()
     //var graph = buildGraph(numPeople);
     //var finalResult = major(graph);
 
-    names = shuffleArrayByWeekNum(currentWeekNum, numPeople);
+    // names = shuffleArrayByWeekNum(currentWeekNum, numPeople);
     theader += printHeadingRow (theader, numPeople, names);
 
     //Per row:
@@ -427,7 +427,7 @@ function rearrangeTables(tables) {
 
 function major (graph, roundsLimit) {
     var currentWeekNum = (new Date()).getWeek();
-    names = shuffleArrayByWeekNum(currentWeekNum, names.length);
+    // names = shuffleArrayByWeekNum(currentWeekNum, names.length);
     var finalResult = [];
 
     while (edgesLeft(graph) && roundsLimit != 0){
