@@ -60,8 +60,6 @@ function insertTable()
     removePeople(removePerson);
 
     var numPeople = names.length;
-    var numWeeks = document.getElementById('weekNum').value;
-    //var weekThrehold = ((numPeople+1)/numWeeks);
     var weekThrehold = 4;
 
     var startHr = document.getElementById('startHour').value;
