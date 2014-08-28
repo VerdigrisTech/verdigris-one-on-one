@@ -4,17 +4,18 @@ var names = ['Andrew', 'Chatty', 'David', 'Jacques',
 var time = ["10:20", "10:40", "11:00", "11:20","11:40",
             "12:00","12:20", "12:40","13:00","13:20", "13:40",
             "14:00","14:20", "14:40","15:00","15:20", "15:40"];
-//tables2 = divideTablesWeek2(graph3, graph4);
-var tables2 = [['Andrew', 'David', 'Luke', 'Martin'],
-               ['Chatty', 'John', 'Sue'],
-               ['Jacques', 'Mark', 'Thomas'],
-               ['Jan', 'Jon', 'Will']];
+
 var numPeoplePerTable = 4;
 
-function getStartDayOfWeek(weekNo){
-    var d1 = new Date();
-    numOfdaysPastSinceLastMonday = eval(d1.getDay()- 1);
-    d1.setDate(d1.getDate() - numOfdaysPastSinceLastMonday);
+function getStartDayOfWeek(){
+    var d1 = new Date(new Date().setDate(new Date().getDate()+21));
+    var weekno = realGetWeek(d1);
+    if (weekno % 2 == 1){
+        d1 = new Date(new Date().setDate(new Date().getDate() - 7));
+    }
+    diffThurs = d1.getDay()- 4;
+    //diffThurs = eval(d1.getDay()- 4);
+    d1.setDate(d1.getDate() - diffThurs);
     return d1;
 };
 
@@ -28,20 +29,6 @@ function printHeadingRow (theader, numPeople, names) {
     return theader;
 }
 
-function minSlots (interval) {
-    var len = 60/interval;
-    var result = [];
-    result[0] = '00';
-    for (var i = 1; i <= len; i++) {
-        result[i] = 60/len*i
-    }
-    if (interval == 30) {
-        shiftArray(result);
-    }
-
-    return result;
-}
-
 function shiftArray (slotArray) {
     var result = [];
     for (var i = 0; i < slotArray.length -1; i++){
@@ -53,6 +40,13 @@ function shiftArray (slotArray) {
 
 function insertTable()
 {
+    // change bi-weekly
+    var now = new Date();
+    var currentWeekNum = new Date(new Date().setDate(now.getDate())).getWeek();
+    console.log(currentWeekNum);
+    if (Math.ceil(currentWeekNum / 2) % 2 == 0) {
+        names = shuffleNamesArray();
+    }
     //add/remove people
     var addPerson = document.getElementById('addP').value;
     if(addPerson) {names.push(addPerson);}
@@ -65,8 +59,7 @@ function insertTable()
     var startHr = document.getElementById('startHour').value;
 
     var weekNum = 1;
-    var currentWeekNum = (new Date()).getWeek();
-    var startDate = getStartDayOfWeek(currentWeekNum);
+
     var theader = "<table id='table1'>";
     var tbody = "";
     var tables = divideTables();
@@ -94,13 +87,13 @@ function insertTable()
 
     // rearrange table for week 2
     var originalTables = tables.slice(0);
-    rearrangeTables(tables);
+    var tables2 = rearrangeTables(tables);
     var part3 = new Array();
     var part4 = new Array();
-    partition(tables, part3, part4);
+    partition(tables2, part3, part4);
     var graph3 = buildGraph(part3);
     var graph4 = buildGraph(part4);
-    removeSameTablePairs(tables, graph3, graph4);
+    removeSameTablePairs(tables2, graph3, graph4);
     var finalResult3 = major(graph3, 4);
     var finalResult4 = major(graph4, 4);
     for (var r = 0; r < Math.max(finalResult3.length, finalResult4.length); r++) {
@@ -109,8 +102,6 @@ function insertTable()
 
     finalResult1.push.apply(finalResult1, finalResult3);
 
-    //var graph = buildGraph(numPeople);
-    //var finalResult = major(graph);
 
     // names = shuffleArrayByWeekNum(currentWeekNum, numPeople);
     theader += printHeadingRow (theader, numPeople, names);
@@ -120,16 +111,25 @@ function insertTable()
     var timeIndex = startHr;
     for(var i = 0; i < finalResult1.length; i++)
     {
-        if (i% (weekThrehold) == 0){
+        if (i == 0){
             var spanNum = numPeople + 1;
-            var endDate = new Date();
-            endDate.setDate(startDate.getDate() + 7);
             tbody += "<tr class=\'highlight\'>" + "<td colspan = \"" + spanNum + "\">";
             tbody += ' Week ' + weekNum + ' : ';
-            tbody += "From " + startDate.toString().substring(0,15) + " To " + endDate.toString().substring(0,15);
+            var startDate = getStartDayOfWeek();
+            tbody += "From " + startDate.toString().substring(0,15);
             tbody += "</td>" + "</tr>";
             weekNum ++ ;
-            startDate = endDate;
+            startDate.setDate(startDate.getDate() + 7);
+            timeIndex = startHr;
+        } else if (i == 4){
+            var spanNum = numPeople + 1;
+            tbody += "<tr class=\'highlight\'>" + "<td colspan = \"" + spanNum + "\">";
+            tbody += ' Week ' + weekNum + ' : ';
+            var startDate = getStartDayOfWeek();
+            startDate.setDate(startDate.getDate() + 7);
+            tbody += "From " + startDate.toString().substring(0,15);
+            tbody += "</td>" + "</tr>";
+            weekNum ++ ;
             timeIndex = startHr;
         }
 
@@ -196,15 +196,38 @@ function printTables2 (tables) {
 
 Date.prototype.getWeek = function() {
     var onejan = new Date(this.getFullYear(), 0, 1);
-    return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+    return Math.floor((((this - onejan) / 86400000) + onejan.getDay() + 1) / 14);
 }
 
-function shuffleArrayByWeekNum (currentWeekNum, numPeople) {
+function realGetWeek (date){
+    var onejan = new Date(date.getFullYear(), 0, 1);
+    return Math.floor((((date - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+}
+
+/* function shuffleArrayByWeekNum (currentWeekNum, numPeople) {
     var startIndex = (Math.ceil(currentWeekNum/2) - 1 ) % numPeople;
     var newStartArray = names.slice(startIndex);
     var restArray = names.slice(0,startIndex);
     names = newStartArray.concat(restArray);
     return names;
+} */
+
+function shuffleNamesArray() {
+    var newArray = new Array();
+
+    var begin = 0;
+    var end = names.length - 1;
+
+    while (begin <= end) {
+        newArray.push(names[begin]);
+        if (begin != end) {
+            newArray.push(names[end]);
+        }
+        begin++;
+        end--;
+    }
+
+    return newArray;
 }
 
 function removePeople(removePerson){
@@ -309,13 +332,53 @@ function divideTables () {
     return tables;
 }
 
+function rearrangeTables(tables) {
+    var tempNames = names.slice(0);
+    var tables2 = new Array(tables.length);
+
+    // initialize the tables
+    for (var i = 0; i < tables.length; i++) {
+        tables2[i] = new Array();
+    }
+
+    var reminder = names.length % tables.length;
+    var isPerfectFilled = reminder == 0 ? true : false;
+
+    // add people to tables:
+    for (var j = 0; j < tables.length; j++) {
+        var it;
+        if (isPerfectFilled) {
+            it = numPeoplePerTable;
+        } else {
+            it = reminder == 0 ? numPeoplePerTable - 1: numPeoplePerTable;
+        }
+        while (tempNames.length > 0) {
+            if (it == 0) {
+                break;
+            }
+
+            tables2[j].push(tempNames.shift());
+            it--;
+        }
+
+        if (reminder > 0) {
+            reminder--;
+        }
+    }
+
+    return tables2;
+}
+
 
 // divide tables into 2 sets for pairing
 // should be different for different weeks
 function partition(tables, part1, part2) {
+
+    // put odd index table in part1
+    // put even index table in part2
     for (var i = 0; i < tables.length; i++) {
-        if (i == tables.length - 1 && (i % 2 == 0)) {
-            var mid = Math.ceil(tables[i].length/2);
+        if (i == tables.length - 1 && (tables.length % 2 == 1)) {
+            var mid = Math.floor(tables[i].length/2);
             for (var j = 0; j < mid; j++) {
                 part1.push(tables[i][j]);
             }
@@ -337,12 +400,11 @@ function removeSameTablePairs(tables, graph1, graph2) {
 
     for (var i = 0; i < tables.length; i++) {
 
-        if (i == tables[i].length - 1 && (tables.length % 2 == 1)) {
-            var mid = Math.ceil(tables[i].length/2);
+        if (i == tables.length - 1 && (tables.length % 2 == 1)) {
+            var mid = Math.floor(tables[i].length/2);
             for (var j = 0; j < tables[i].length; j++) {
                 var vertex;
                 if (j < mid) {
-                    console.log(tables[i][j]);
                     vertex = vertexByName(graph1, tables[i][j]);
                 } else {
                     vertex = vertexByName(graph2, tables[i][j]);
@@ -364,35 +426,36 @@ function removeSameTablePairs(tables, graph1, graph2) {
                     }
                 }
             }
-        }
-
-        if (i % 2 == 1) {
-            for (var j = 0; j < tables[i].length; j++) {
-                var vertex = vertexByName(graph1, tables[i][j]);
-                for (var k = j + 1; k < tables[i].length; k++) {
-                    var index = vertex.neighbors.indexOf(tables[i][k]);
-                    if(index > -1) {
-                        vertex.neighbors.splice(index, 1);
-                    }
-                    var vertexNeighbor = vertexByName(graph1, tables[i][k]);
-                    index = vertexNeighbor.neighbors.indexOf(tables[i][j]);
-                    if(index > -1) {
-                        vertexNeighbor.neighbors.splice(index, 1);
-                    }
-                }
-            }
         } else {
-            for (var j = 0; j < tables[i].length; j++) {
-                var vertex = vertexByName(graph2, tables[i][j]);
-                for (var k = j + 1; k < tables[i].length; k++) {
-                    var index = vertex.neighbors.indexOf(tables[i][k]);
-                    if(index > -1) {
-                        vertex.neighbors.splice(index, 1);
+
+            if (i % 2 == 1) {
+                for (var j = 0; j < tables[i].length; j++) {
+                    var vertex = vertexByName(graph1, tables[i][j]);
+                    for (var k = j + 1; k < tables[i].length; k++) {
+                        var index = vertex.neighbors.indexOf(tables[i][k]);
+                        if(index > -1) {
+                            vertex.neighbors.splice(index, 1);
+                        }
+                        var vertexNeighbor = vertexByName(graph1, tables[i][k]);
+                        index = vertexNeighbor.neighbors.indexOf(tables[i][j]);
+                        if(index > -1) {
+                            vertexNeighbor.neighbors.splice(index, 1);
+                        }
                     }
-                    var vertexNeighbor = vertexByName(graph2, tables[i][k]);
-                    index = vertexNeighbor.neighbors.indexOf(tables[i][j]);
-                    if(index > -1) {
-                        vertexNeighbor.neighbors.splice(index, 1);
+                }
+            } else {
+                for (var j = 0; j < tables[i].length; j++) {
+                    var vertex = vertexByName(graph2, tables[i][j]);
+                    for (var k = j + 1; k < tables[i].length; k++) {
+                        var index = vertex.neighbors.indexOf(tables[i][k]);
+                        if(index > -1) {
+                            vertex.neighbors.splice(index, 1);
+                        }
+                        var vertexNeighbor = vertexByName(graph2, tables[i][k]);
+                        index = vertexNeighbor.neighbors.indexOf(tables[i][j]);
+                        if(index > -1) {
+                            vertexNeighbor.neighbors.splice(index, 1);
+                        }
                     }
                 }
             }
@@ -400,30 +463,6 @@ function removeSameTablePairs(tables, graph1, graph2) {
     }
 }
 
-function rearrangeTables(tables) {
-    var mid = Math.ceil(tables.length / 2);
-
-    for (var i = 0; i < Math.ceil(mid / 2); i++) {
-        var temp = tables[i];
-        tables[i] = tables[mid - i - 1];
-        tables[mid - i - 1] = temp;
-    }
-}
-
-// function divideTablesWeek2(graph1, graph2) {
-//     var numTables = Math.ceil(names.length / numPeoplePerTable);
-//     var tables2 = new Array(numTables);
-//     for (var t = 0; t < numTables; t++) {
-//         tables2[t] = new Array();
-//     }
-
-//     var tableIndex = 0
-//     for (var i = 0; i < names.length; i++) {
-//         if (tables2[tableIndex].length == 0) {
-
-//         }
-//     }
-// }
 
 function major (graph, roundsLimit) {
     var currentWeekNum = (new Date()).getWeek();
