@@ -8,7 +8,7 @@ var time = ["10:20", "10:40", "11:00", "11:20","11:40",
 var numPeoplePerTable = 4;
 
 function getStartDayOfWeek(){
-    var d1 = new Date(new Date().setDate(new Date().getDate()+21));
+    var d1 = new Date(new Date().setDate(new Date().getDate()));
     var weekno = realGetWeek(d1);
     if (weekno % 2 == 1){
         d1 = new Date(new Date().setDate(new Date().getDate() - 7));
@@ -116,7 +116,7 @@ function insertTable()
             tbody += "<tr class=\'highlight\'>" + "<td colspan = \"" + spanNum + "\">";
             tbody += ' Week ' + weekNum + ' : ';
             var startDate = getStartDayOfWeek();
-            tbody += "From " + startDate.toString().substring(0,15);
+            tbody += startDate.toString().substring(0,15);
             tbody += "</td>" + "</tr>";
             weekNum ++ ;
             startDate.setDate(startDate.getDate() + 7);
@@ -127,7 +127,7 @@ function insertTable()
             tbody += ' Week ' + weekNum + ' : ';
             var startDate = getStartDayOfWeek();
             startDate.setDate(startDate.getDate() + 7);
-            tbody += "From " + startDate.toString().substring(0,15);
+            tbody += startDate.toString().substring(0,15);
             tbody += "</td>" + "</tr>";
             weekNum ++ ;
             timeIndex = startHr;
