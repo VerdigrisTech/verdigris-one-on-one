@@ -116,7 +116,8 @@ function insertTable()
             tbody += "<tr class=\'highlight\'>" + "<td colspan = \"" + spanNum + "\">";
             tbody += ' Week ' + weekNum + ' : ';
             var startDate = getStartDayOfWeek();
-            tbody += startDate.toString().substring(0,15);
+            // tbody += startDate.toString().substring(0,15);
+            tbody += "Sep. 4";
             tbody += "</td>" + "</tr>";
             weekNum ++ ;
             startDate.setDate(startDate.getDate() + 7);
@@ -127,7 +128,8 @@ function insertTable()
             tbody += ' Week ' + weekNum + ' : ';
             var startDate = getStartDayOfWeek();
             startDate.setDate(startDate.getDate() + 7);
-            tbody += startDate.toString().substring(0,15);
+            // tbody += startDate.toString().substring(0,15);
+            tbody += "Sep. 11";
             tbody += "</td>" + "</tr>";
             weekNum ++ ;
             timeIndex = startHr;
