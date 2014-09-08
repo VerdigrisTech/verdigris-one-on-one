@@ -1,6 +1,6 @@
 var names = ['Andrew', 'Chatty', 'Jacques',
-              'Jan', 'John', 'Jon', 'Luke', 'Mark',
-              'Martin', 'Patrick', 'Sue', 'Thomas', 'Will'];
+             'John', 'Jon', 'Luke', 'Mark',
+              'Martin', 'Patrick', 'Thomas', 'Will'];
 var time = ["10:20", "10:40", "11:00", "11:20","11:40",
             "12:00","12:20", "12:40","13:00","13:20", "13:40",
             "14:00","14:20", "14:40","15:00","15:20", "15:40"];
@@ -40,10 +40,10 @@ function shiftArray (slotArray) {
 
 function insertTable()
 {
+
     // change bi-weekly
     var now = new Date();
     var currentWeekNum = new Date(new Date().setDate(now.getDate())).getWeek();
-    console.log(currentWeekNum);
     if (Math.ceil(currentWeekNum / 2) % 2 == 0) {
         names = shuffleNamesArray();
     }
@@ -63,44 +63,65 @@ function insertTable()
     var theader = "<table id='table1'>";
     var tbody = "";
     var tables = divideTables();
-    var part1 = new Array();
-    var part2 = new Array();
+    var finalResult1, originalTables, tables2;
 
-    // put all the tables into two sets for pairing
-    partition(tables, part1, part2);
+    // tables <= 3 for edge cases
+    if (tables.length > 3) {
 
-    // build graphs for the two sets
-    var graph1 = buildGraph(part1);
-    var graph2 = buildGraph(part2);
+        var part1 = new Array();
+        var part2 = new Array();
 
-    // remove pairs between people in the same table
-    removeSameTablePairs(tables, graph1, graph2);
+        // put all the tables into two sets for pairing
+        partition(tables, part1, part2);
 
-    // make schedules for two sets
-    var finalResult1 = major(graph1, 4);
-    var finalResult2 = major(graph2, 4);
+        // build graphs for the two sets
+        var graph1 = buildGraph(part1);
+        var graph2 = buildGraph(part2);
 
-    // put the schedules together for display
-    for (var r = 0; r < Math.max(finalResult1.length, finalResult2.length); r++) {
-        finalResult1[r].push.apply(finalResult1[r], finalResult2[r]);
+        // remove pairs between people in the same table
+        removeSameTablePairs(tables, graph1, graph2);
+
+        // make schedules for two sets
+        finalResult1 = major(graph1, 4);
+        var finalResult2 = major(graph2, 4);
+
+        // put the schedules together for display
+        for (var r = 0; r < Math.max(finalResult1.length, finalResult2.length); r++) {
+            finalResult1[r].push.apply(finalResult1[r], finalResult2[r]);
+        }
+
+        // rearrange table for week 2
+        originalTables = tables.slice(0);
+        tables2 = rearrangeTables(tables);
+        var part3 = new Array();
+        var part4 = new Array();
+        partition(tables2, part3, part4);
+        var graph3 = buildGraph(part3);
+        var graph4 = buildGraph(part4);
+        removeSameTablePairs(tables2, graph3, graph4);
+        var finalResult3 = major(graph3, 4);
+        var finalResult4 = major(graph4, 4);
+        for (var r = 0; r < Math.max(finalResult3.length, finalResult4.length); r++) {
+            finalResult3[r].push.apply(finalResult3[r], finalResult4[r]);
+        }
+
+        finalResult1.push.apply(finalResult1, finalResult3);
+    } else {
+        var graph = buildGraph(names);
+        removeSameTablePairs(tables, graph, null);
+        finalResult1 = major(graph, 4);
+
+        originalTables = tables.slice(0);
+        tables2 = rearrangeTables(tables);
+        var tempNames = new Array();
+        for (var i = 0; i < tables2.length; i++) {
+            tempNames.push.apply(tempNames, tables2[i]);
+        }
+        graph = buildGraph(tempNames, 4);
+        removeSameTablePairs(tables2, graph, null);
+        var temp = major(graph, 4);
+        finalResult1.push.apply(finalResult1, temp);
     }
-
-    // rearrange table for week 2
-    var originalTables = tables.slice(0);
-    var tables2 = rearrangeTables(tables);
-    var part3 = new Array();
-    var part4 = new Array();
-    partition(tables2, part3, part4);
-    var graph3 = buildGraph(part3);
-    var graph4 = buildGraph(part4);
-    removeSameTablePairs(tables2, graph3, graph4);
-    var finalResult3 = major(graph3, 4);
-    var finalResult4 = major(graph4, 4);
-    for (var r = 0; r < Math.max(finalResult3.length, finalResult4.length); r++) {
-        finalResult3[r].push.apply(finalResult3[r], finalResult4[r]);
-    }
-
-    finalResult1.push.apply(finalResult1, finalResult3);
 
 
     // names = shuffleArrayByWeekNum(currentWeekNum, numPeople);
@@ -116,8 +137,7 @@ function insertTable()
             tbody += "<tr class=\'highlight\'>" + "<td colspan = \"" + spanNum + "\">";
             tbody += ' Week ' + weekNum + ' : ';
             var startDate = getStartDayOfWeek();
-            // tbody += startDate.toString().substring(0,15);
-            tbody += "Sep. 4";
+            tbody += startDate.toString().substring(0,15);
             tbody += "</td>" + "</tr>";
             weekNum ++ ;
             startDate.setDate(startDate.getDate() + 7);
@@ -128,8 +148,7 @@ function insertTable()
             tbody += ' Week ' + weekNum + ' : ';
             var startDate = getStartDayOfWeek();
             startDate.setDate(startDate.getDate() + 7);
-            // tbody += startDate.toString().substring(0,15);
-            tbody += "Sep. 11";
+            tbody += startDate.toString().substring(0,15);
             tbody += "</td>" + "</tr>";
             weekNum ++ ;
             timeIndex = startHr;
@@ -162,6 +181,7 @@ function insertTable()
     var tfooter = "</table>";
     document.getElementById('schedule').innerHTML = theader + tbody + tfooter;
     currentPeople();
+    clearTables();
     printTables(originalTables);
     printTables2(tables2);
     cleanFields();
@@ -193,6 +213,14 @@ function printTables (tables) {
 function printTables2 (tables) {
     for (var i = 0; i < tables.length; i++){
         printTable(tables[i], 'table0' + [i+5]);
+    }
+}
+
+// clear the previous table when generating
+function clearTables () {
+    for (var i = 1; i <= 8; i++) {
+        var name = 'table0' + i;
+        document.getElementById(name).innerHTML= "<tr><td></td></tr>";
     }
 }
 
@@ -334,6 +362,7 @@ function divideTables () {
     return tables;
 }
 
+// rearrange tables for week 2 use
 function rearrangeTables(tables) {
     var tempNames = names.slice(0);
     var tables2 = new Array(tables.length);
@@ -350,7 +379,7 @@ function rearrangeTables(tables) {
     for (var j = 0; j < tables.length; j++) {
         var it;
         if (isPerfectFilled) {
-            it = numPeoplePerTable;
+            it = names.length / tables.length;
         } else {
             it = reminder == 0 ? numPeoplePerTable - 1: numPeoplePerTable;
         }
@@ -373,7 +402,6 @@ function rearrangeTables(tables) {
 
 
 // divide tables into 2 sets for pairing
-// should be different for different weeks
 function partition(tables, part1, part2) {
 
     // put odd index table in part1
@@ -397,48 +425,34 @@ function partition(tables, part1, part2) {
     }
 }
 
-// should be different for different weeks
+// remove the edges between members in same table
 function removeSameTablePairs(tables, graph1, graph2) {
 
-    for (var i = 0; i < tables.length; i++) {
+    // tables <= 3 for edge cases
+    if (tables.length > 3) {
 
-        if (i == tables.length - 1 && (tables.length % 2 == 1)) {
-            var mid = Math.floor(tables[i].length/2);
-            for (var j = 0; j < tables[i].length; j++) {
-                var vertex;
-                if (j < mid) {
-                    vertex = vertexByName(graph1, tables[i][j]);
-                } else {
-                    vertex = vertexByName(graph2, tables[i][j]);
-                }
-                for (var k = j + 1; k < tables[i].length; k++) {
-                    var index = vertex.neighbors.indexOf(tables[i][k]);
-                    if(index > -1) {
-                        vertex.neighbors.splice(index, 1);
-                    }
-                    var vertexNeighbor;
-                    if (k < mid) {
-                        vertexNeighbor = vertexByName(graph1, tables[i][k]);
-                    } else {
-                        vertexNeighbor = vertexByName(graph2, tables[i][k]);
-                    }
-                    index = vertexNeighbor.neighbors.indexOf(tables[i][j]);
-                    if(index > -1) {
-                        vertexNeighbor.neighbors.splice(index, 1);
-                    }
-                }
-            }
-        } else {
+        for (var i = 0; i < tables.length; i++) {
 
-            if (i % 2 == 1) {
+            if (i == tables.length - 1 && (tables.length % 2 == 1)) {
+                var mid = Math.floor(tables[i].length/2);
                 for (var j = 0; j < tables[i].length; j++) {
-                    var vertex = vertexByName(graph1, tables[i][j]);
+                    var vertex;
+                    if (j < mid) {
+                        vertex = vertexByName(graph1, tables[i][j]);
+                    } else {
+                        vertex = vertexByName(graph2, tables[i][j]);
+                    }
                     for (var k = j + 1; k < tables[i].length; k++) {
                         var index = vertex.neighbors.indexOf(tables[i][k]);
                         if(index > -1) {
                             vertex.neighbors.splice(index, 1);
                         }
-                        var vertexNeighbor = vertexByName(graph1, tables[i][k]);
+                        var vertexNeighbor;
+                        if (k < mid) {
+                            vertexNeighbor = vertexByName(graph1, tables[i][k]);
+                        } else {
+                            vertexNeighbor = vertexByName(graph2, tables[i][k]);
+                        }
                         index = vertexNeighbor.neighbors.indexOf(tables[i][j]);
                         if(index > -1) {
                             vertexNeighbor.neighbors.splice(index, 1);
@@ -446,18 +460,53 @@ function removeSameTablePairs(tables, graph1, graph2) {
                     }
                 }
             } else {
-                for (var j = 0; j < tables[i].length; j++) {
-                    var vertex = vertexByName(graph2, tables[i][j]);
-                    for (var k = j + 1; k < tables[i].length; k++) {
-                        var index = vertex.neighbors.indexOf(tables[i][k]);
-                        if(index > -1) {
-                            vertex.neighbors.splice(index, 1);
+
+                if (i % 2 == 1) {
+                    for (var j = 0; j < tables[i].length; j++) {
+                        var vertex = vertexByName(graph1, tables[i][j]);
+                        for (var k = j + 1; k < tables[i].length; k++) {
+                            var index = vertex.neighbors.indexOf(tables[i][k]);
+                            if(index > -1) {
+                                vertex.neighbors.splice(index, 1);
+                            }
+                            var vertexNeighbor = vertexByName(graph1, tables[i][k]);
+                            index = vertexNeighbor.neighbors.indexOf(tables[i][j]);
+                            if(index > -1) {
+                                vertexNeighbor.neighbors.splice(index, 1);
+                            }
                         }
-                        var vertexNeighbor = vertexByName(graph2, tables[i][k]);
-                        index = vertexNeighbor.neighbors.indexOf(tables[i][j]);
-                        if(index > -1) {
-                            vertexNeighbor.neighbors.splice(index, 1);
+                    }
+                } else {
+                    for (var j = 0; j < tables[i].length; j++) {
+                        var vertex = vertexByName(graph2, tables[i][j]);
+                        for (var k = j + 1; k < tables[i].length; k++) {
+                            var index = vertex.neighbors.indexOf(tables[i][k]);
+                            if(index > -1) {
+                                vertex.neighbors.splice(index, 1);
+                            }
+                            var vertexNeighbor = vertexByName(graph2, tables[i][k]);
+                            index = vertexNeighbor.neighbors.indexOf(tables[i][j]);
+                            if(index > -1) {
+                                vertexNeighbor.neighbors.splice(index, 1);
+                            }
                         }
+                    }
+                }
+            }
+        }
+    } else {
+        for (var i = 0; i < tables.length; i++) {
+            for (var j = 0; j < tables[i].length; j++) {
+                var vertex = vertexByName(graph1, tables[i][j]);
+                for (var k = j + 1; k < tables[i].length; k++) {
+                    var index = vertex.neighbors.indexOf(tables[i][k]);
+                    if (index > -1) {
+                        vertex.neighbors.splice(index, 1);
+                    }
+                    var vertexNeighbor = vertexByName(graph1, tables[i][k]);
+                    index = vertexNeighbor.neighbors.indexOf(tables[i][j]);
+                    if(index > -1) {
+                        vertexNeighbor.neighbors.splice(index, 1);
                     }
                 }
             }
@@ -465,7 +514,7 @@ function removeSameTablePairs(tables, graph1, graph2) {
     }
 }
 
-
+// major algorithm for basic pairing in graph
 function major (graph, roundsLimit) {
     var currentWeekNum = (new Date()).getWeek();
     // names = shuffleArrayByWeekNum(currentWeekNum, names.length);
