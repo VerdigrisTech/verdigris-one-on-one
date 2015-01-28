@@ -1,6 +1,6 @@
 var names = ['Andrew', 'Chatty', 'Dawn', 'Jacques',
              'John', 'Jon', 'Liz', 'Mark',
-              'Martin', 'Patrick', 'Thomas', 'Vik', 'Will'];
+              'Martin', 'Myqe', 'Patrick', 'Thomas', 'Vik', 'Will'];
 var time = ["9:20", "9:40", "10:00",
             "10:20", "10:40", "11:00", "11:20","11:40",
             "12:00","12:20", "12:40","13:00","13:20", "13:40",
